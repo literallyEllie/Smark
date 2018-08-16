@@ -10,9 +10,9 @@ As to what it will turn into, I couldn't say.
 
 ### Pictures: 
 
-Login page: [Login page](https://i.imgur.com/Ri3Y0MB.jpg) *It is centered I swear*
+Login page: ![Login page](https://i.imgur.com/Ri3Y0MB.jpg) *It is centered I swear*
 
-Users only: [Users only page](https://i.imgur.com/64Lrdeu.jpg)
+Users only! ![Users only page](https://i.imgur.com/64Lrdeu.jpg)
 
-## It is currently riddled with debug messages and flaws but I will get to it
+### It is currently riddled with debug messages and flaws but I will get to it
 Bye!!
