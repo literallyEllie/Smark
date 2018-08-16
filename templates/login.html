@@ -1,0 +1,28 @@
+{{ template "header" . }}
+
+<div class="login">
+	<div class="login-container">
+		<h1>Smark</h1>
+{{ if eq .Username "" }}
+	{{ if .LoggedOut }}
+		<h2>You were logged out!<h2>
+	{{ else }}
+		<h2>You need to login!</h2>
+	{{ end }}
+	<form method="post">
+		<div class="form-input">
+			<input type="text" id="username" name="username" placeholder="Enter username" autofocus required><br />
+			<input type="password" id="password" name="password" placeholder="Enter password" required><br />
+			<input type="submit" value="Login">	<br/>	
+			<input type="submit" value="No account? Sign up here">	<br/>			
+		</div>
+	</form>
+{{ else }}
+<h2>You are already logged in!</h2>
+<h3><a href="index">Click here to return to safety</a></h3>
+
+{{end}}
+
+</div>
+</div>
+{{ template "footer" . }}
