@@ -1,0 +1,28 @@
+{{ template "header" . }}
+
+<div class="center-container">
+	<h1>Smark</h1>
+{{ if eq .Viewer.Username "" }}
+	{{ if .Error }}
+		<h2>{{ .Error }}</h2>
+	{{ else }}
+		<h2>Welcome!</h2>
+	{{ end }}
+	<form method="post">
+		<div class="form-input">
+			<input type="email" id="email" name="email" placeholder="Your email" autofocus required><br />
+			<input type="text" id="username" name="username" placeholder="A unique username" autofocus required><br />
+			<input type="password" id="password" name="password" placeholder="A secret password" required><br />
+			<input type="submit" value="Signup"> <br/>	
+		</div>
+	</form>
+	<form action="/login">
+		<input type="submit" value="Done this? Login here">	<br/>			
+	</form>
+{{ else }}
+<h2>You are already logged in!</h2>
+<h3><a href="index">Click here to return to safety</a></h3>
+
+{{end}}
+</div>
+{{ template "footer" . }}

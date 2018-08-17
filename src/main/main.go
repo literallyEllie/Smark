@@ -2,66 +2,114 @@ package main
 
 import (
 	"html/template"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+	"regexp"
+	"strings"
 
 	"github.com/gorilla/context"
 )
 
-// UserDB is a temp map containing user data, an effective database
-var UserDB = map[string]*User{}
-
 const templatePath = "templates"
+
+// ViewData is the data passed to the templates when a page is loaded.
+type ViewData struct {
+	Viewer *User
+	Error  string
+	Data   map[string]string
+}
 
 // User contains data about a user
 type User struct {
-	Username  string
-	Password  string
-	IsAdmin   bool
-	LoggedOut bool
+	Email    string
+	Username string
+	Password string
+	IsAdmin  bool
 }
 
 var templates *template.Template
+var regexEmail *regexp.Regexp
 
 func main() {
 	templates = populateTemplates()
+	regexEmail = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
 
-	testUser := &User{Username: "Test", Password: "jkdgf", IsAdmin: false}
-	UserDB[testUser.Username] = testUser
+	createUser("test@cheese.com", "Test", "jkdgf")
 
-	// userTwo := &user{fName: "Dave", lName: "Cool", admin: true}
+	adminAccount, _ := createUser("ellie@cheese.com", "ellie", "admin123")
+	adminAccount.IsAdmin = true
+	SaveAccount(adminAccount)
 
-	//http.Handle("/jim", userOne)
-	//	http.Handle("/dave", userTwo)
-	// http.Handle("/profile", new(user))
-	// http.Handle("/", new(fileHandle))
+	// MongoDB Setup
+	// session, err := mgo.Dial("mongodb+srv://ellie:XXXXX@smark-gv8wv.gcp.mongodb.net/test")
+	// if err != nil {
+	//log.Panicf("Error connecting to database.", err)
+	// return
+	// }
+	// names := session.DatabaseNames
+	// log.Println("hi", names)
+
 	http.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
-		requestedFile := req.URL.Path[1:]
+		requestedPath := req.URL.Path[1:]
+		if requestedPath == "/" || requestedPath == "" {
+			requestedPath += "dashboard"
+		}
 
 		// Get the page
-		template := templates.Lookup(requestedFile + ".html")
+		template := templates.Lookup(requestedPath + ".html")
 
 		if template != nil {
-			log.Println("not null template")
 			// Check user has access to page
-			user, err := CheckAccess(w, req, requestedFile)
+			user, err := CheckAccess(w, req, requestedPath)
 
 			// they have rights, if not, they will have been redirected.
 			if err == nil {
-				// Execute page with user template.
-				template.Execute(w, user)
+				// Execute page with viewer data.
+				err = template.Execute(w, &ViewData{Viewer: user})
+				if err != nil {
+					log.Println("[!!] Failed to exectute template ", err)
+				}
 			}
 
 		} else {
-			w.WriteHeader(404)
+			http.Redirect(w, req, "/404", http.StatusSeeOther)
 		}
 
 	})
 	http.HandleFunc("/login", loginHandle)
+	http.HandleFunc("/signup", signupHandle)
 	http.HandleFunc("/logout", logoutHandle)
+	http.HandleFunc("/res/", handleResourceRequest)
 
 	http.ListenAndServe(":8080", context.ClearHandler(http.DefaultServeMux))
+}
+
+// Method to handle requests to the resources folder
+func handleResourceRequest(w http.ResponseWriter, req *http.Request) {
+	path := req.URL.Path[len("/res"):]
+	data, err := ioutil.ReadFile("templates/res/" + string(path))
+
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	var contentType string
+
+	if strings.HasSuffix(path, ".css") {
+		contentType = "text/css"
+	} else if strings.HasSuffix(path, ".png") {
+		contentType = "image/png"
+	} else if strings.HasSuffix(path, ".jpg") {
+		contentType = "image/jpg"
+	} else {
+		contentType = "text/plain"
+	}
+
+	w.Header().Add("Content Type", contentType)
+	w.Write(data)
 }
 
 func populateTemplates() *template.Template {
@@ -79,6 +127,9 @@ func populateTemplates() *template.Template {
 	}
 
 	_, err := result.ParseFiles(*templatePaths...)
-	log.Println(err)
+	if err != nil {
+		log.Println("[!!] Failed to load templates ", err)
+	}
+
 	return result
 }

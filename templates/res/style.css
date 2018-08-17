@@ -1,0 +1,87 @@
+* {
+    font-family: Monospace;
+}
+
+h1 {
+    color: rgb(255,255,0);
+    font-family: Verdana;
+}
+
+body { 
+    background: url("background.jpg");
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+a {
+    color: rgb(240,128,128);
+}
+
+/* Side bar */
+.vertical-side {
+    width: 60px;
+    height: 30px;
+    border-radius: 10px;
+}
+
+.vertical-side a {
+    background-color: rgb(186,85,211, 0.7);
+    color: black;
+
+    text-decoration: none;
+}
+
+/* Index */
+.a-box {
+    width: 450px;
+    height: 150px;
+    padding-top: 10px;
+    padding-left: 20px;
+    margin: 6em;
+    border-radius: 15px;
+    background: rgb(186,85,211, 0.7);
+}
+
+.a-box i {
+    float: right;
+    right: 0px;
+    padding: 10px;
+}
+
+/* Center boxes!  */
+.center-container {
+    width: 500px;
+    height: 400px;
+    padding-top: 50px;
+    margin: 7em auto;
+    border-radius: 15px;
+    text-align: center;
+}
+
+.center-container h1 {
+    padding-top: 15px;
+}
+
+.center-container h2 {
+    color: rgb(255,99,71);
+    padding-top: 5px;
+    padding-bottom: 15px;
+}
+
+.center-container input[type="email"],input[type="text"],input[type="password"] {
+    width: 240px;
+    height: 44px;
+    margin-bottom: 20px;
+    font-size: 10px;
+    border: 1px solid #000;
+    padding-left: 15px;
+}
+
+.center-container input[type="submit"] {
+    padding: 15px 25px;
+    background: rgb(70, 29, 140);
+    color: #fff;
+    border: none;
+    margin-bottom: 20px;
+    cursor: pointer;
+}

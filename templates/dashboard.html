@@ -1,14 +1,12 @@
 {{ template "header" . }}
 
+{{ template "main" . }}
+
 <div class="a-box">
 
-    <h3>Welcome back, {{.Username}}</h3>
+    <h3>Welcome back,{{if .Viewer.IsAdmin}} [ADMIN]{{end}} {{.Viewer.Username}}</h3>
     <i class="fas fa-user-alt fa-5x" aria-hidden="true"></i>
 
 </div>
-
-
-
-
 
 {{ template "footer" . }}

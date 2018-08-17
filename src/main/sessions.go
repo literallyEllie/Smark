@@ -31,43 +31,92 @@ func loginHandle(w http.ResponseWriter, req *http.Request) {
 
 		// tell them to go away
 		if !ok {
-			http.Error(w, "User doesn't exist", http.StatusForbidden)
+			http.Redirect(w, req, "/login?err=User doesn't exist", http.StatusSeeOther)
 			return
 		}
 
 		// check credentials
-		if u.Username == username && u.Password == password {
+		if (u.Username == username || u.Email == username) && u.Password == password {
 			createCookie(u, req, w)
-			http.Redirect(w, req, "/index", http.StatusSeeOther)
+			http.Redirect(w, req, "/dashboard", http.StatusSeeOther)
 			return
 		}
 
 		// go away
-		http.Error(w, "Invalid credentials", http.StatusForbidden)
+		http.Redirect(w, req, "/login?err=Invalid credentials", http.StatusSeeOther)
 		return
 	}
 
 	user, _, err := GetSessionedUser(req, w)
+	viewData := &ViewData{Viewer: user}
 
 	// Check if was logged out
 	_, isLogout := req.URL.Query()["logout"]
 	if isLogout {
-		user = &User{LoggedOut: true}
-	} else if err != nil {
-		// If they weren't logged out and they're also not logged in
-		user = &User{LoggedOut: false}
+		viewData.Error = "Logged out"
 	}
 
-	err = templates.ExecuteTemplate(w, "login.html", user)
+	// Questionable
+	oldError, ok := req.URL.Query()["err"]
+	if ok && len(oldError) == 1 {
+		viewData.Error = oldError[0]
+	}
+
+	if err != nil {
+		viewData.Viewer = &User{Username: ""}
+	}
+
+	err = templates.ExecuteTemplate(w, "login.html", viewData)
 	if err != nil {
 		log.Println("Error exectuing login template ", err)
 	}
+
+}
+
+func signupHandle(w http.ResponseWriter, req *http.Request) {
+	if req.Method == "POST" {
+
+		// get credentials
+		email := req.FormValue("email")
+		username := req.FormValue("username")
+		password := req.FormValue("password")
+
+		u, err := createUser(email, username, password)
+		if err != nil {
+			http.Redirect(w, req, "/signup?err="+err.Error(), http.StatusSeeOther)
+			return
+		}
+
+		// create session + redirect
+		createCookie(u, req, w)
+		http.Redirect(w, req, "/dashboard", http.StatusSeeOther)
+		return
+	}
+
+	user, _, err := GetSessionedUser(req, w)
+	viewData := &ViewData{Viewer: user}
+
+	// Questionable
+	oldError, ok := req.URL.Query()["err"]
+	if ok && len(oldError) == 1 {
+		viewData.Error = oldError[0]
+	}
+
+	if err != nil {
+		viewData.Viewer = &User{Username: ""}
+	}
+
+	err = templates.ExecuteTemplate(w, "signup.html", viewData)
+	if err != nil {
+		log.Println("Error exectuing signup template ", err)
+	}
+
 }
 
 func logoutHandle(w http.ResponseWriter, req *http.Request) {
 	user, _, err := GetSessionedUser(req, w)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Redirect(w, req, "/login?err="+err.Error(), http.StatusSeeOther)
 		return
 	}
 
@@ -78,17 +127,17 @@ func logoutHandle(w http.ResponseWriter, req *http.Request) {
 // GetSessionedUser gets user data, their session id and if an error occurs, that too
 func GetSessionedUser(req *http.Request, w http.ResponseWriter) (*User, string, error) {
 	session, err := cookies.Get(req, "session-id")
-	var user *User
+	user := &User{Username: ""}
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return user, "", err
 	}
 
 	// Get their session key id thing
 	sessionKeyRaw := session.Values["id"]
 	if sessionKeyRaw == nil {
-		return user, "", errors.New("not logged in")
+		// I know this goes against error conventions but it shows to the end user
+		return user, "", errors.New(" You were not logged in. ")
 	}
 	sessionKey := sessionKeyRaw.(string)
 
@@ -96,7 +145,8 @@ func GetSessionedUser(req *http.Request, w http.ResponseWriter) (*User, string, 
 
 	// If they aren't logged in
 	if !ok {
-		return user, "", errors.New("not logged in")
+		user = &User{Username: ""}
+		return user, "", errors.New(" You were not logged in. ")
 	}
 
 	return user, sessionKey, nil
@@ -129,6 +179,12 @@ func createCookie(u *User, req *http.Request, w http.ResponseWriter) {
 	SessionData[newKey] = u
 }
 
+func createFlashCookie(req *http.Request, w http.ResponseWriter) {
+	session, err := cookies.Get(req, "session-id")
+	e
+
+}
+
 // Deletes a cookie by a user
 func deleteCookie(u *User, req *http.Request, w http.ResponseWriter) {
 	// Can't get data via GetSessionedUser as we need to get Session and expire it.
@@ -137,6 +193,13 @@ func deleteCookie(u *User, req *http.Request, w http.ResponseWriter) {
 		UserDB[u.Username] = u
 		log.Printf("[!!] Failed to delete get cookie info from Cookies for %s", u.Username)
 		// TODO try and get session id from looking SessionData
+
+		cookie, err := req.Cookie("session-id")
+		if err == nil {
+			cookie.MaxAge = -1
+			http.SetCookie(w, cookie)
+		}
+
 		return
 	}
 
@@ -155,6 +218,14 @@ func deleteCookie(u *User, req *http.Request, w http.ResponseWriter) {
 	// Expire cookie
 	session.Options.MaxAge = -1
 	cookies.Save(req, w, session)
+
+	// remove it manually in case their session was corrupted
+	cookie, err := req.Cookie("session-id")
+	if err == nil {
+		cookie.MaxAge = -1
+		http.SetCookie(w, cookie)
+	}
+
 }
 
 // CheckAccess checks access of a requester ensuring they have rights to visit
@@ -164,12 +235,10 @@ func CheckAccess(w http.ResponseWriter, req *http.Request, reqPage string) (*Use
 	user, _, err := GetSessionedUser(req, w)
 
 	// If they're not logged in (i.e in SessionData) and they're not already trying to login, tell them to go away.
-	if err != nil && reqPage != "login" {
+	if err != nil && !(reqPage == "login" || reqPage == "signup" || reqPage == "404") {
 		http.Redirect(w, req, "/login", http.StatusSeeOther)
 		return user, err
 	}
-
-	log.Println("ok")
 
 	// Return their data and its all gucci
 	w.WriteHeader(http.StatusOK)
