@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/gob"
 	"html/template"
 	"io/ioutil"
 	"log"
@@ -16,9 +17,8 @@ const templatePath = "templates"
 
 // ViewData is the data passed to the templates when a page is loaded.
 type ViewData struct {
-	Viewer *User
-	Error  string
-	Data   map[string]string
+	Viewer    *User
+	FlashData []FlashCookie
 }
 
 // User contains data about a user
@@ -42,10 +42,12 @@ func main() {
 	adminAccount.IsAdmin = true
 	SaveAccount(adminAccount)
 
+	gob.Register(FlashCookie{})
+
 	// MongoDB Setup
 	// session, err := mgo.Dial("mongodb+srv://ellie:XXXXX@smark-gv8wv.gcp.mongodb.net/test")
 	// if err != nil {
-	//log.Panicf("Error connecting to database.", err)
+	// log.Panicf("Error connecting to database.", err)
 	// return
 	// }
 	// names := session.DatabaseNames
@@ -67,7 +69,10 @@ func main() {
 			// they have rights, if not, they will have been redirected.
 			if err == nil {
 				// Execute page with viewer data.
-				err = template.Execute(w, &ViewData{Viewer: user})
+				viewData := &ViewData{Viewer: user}
+				LoadFlashCookies(req, w, viewData)
+
+				err = template.Execute(w, viewData)
 				if err != nil {
 					log.Println("[!!] Failed to exectute template ", err)
 				}
@@ -112,6 +117,7 @@ func handleResourceRequest(w http.ResponseWriter, req *http.Request) {
 	w.Write(data)
 }
 
+// Method to get templates
 func populateTemplates() *template.Template {
 	result := template.New("templates")
 

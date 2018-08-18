@@ -3,10 +3,16 @@
 <div class="center-container">
 	<h1>Smark</h1>
 {{ if eq .Viewer.Username "" }}
-	{{ if .Error }}
-		<h2>{{ .Error }}</h2>
+	{{ if .FlashData }}
+		{{ range .FlashData }}
+			{{ if eq .Type 1 }}
+				<h2 class="notify-error">{{ .Message }}</h2>
+			{{ else }}
+				<h2 class="notify-info">{{ .Message }}</h2>
+			{{ end }}
+		{{ end }}
 	{{ else }}
-		<h2>You need to login!</h2>
+		<h2 class="notify-info">You need to login!</h2>
 	{{ end }}
 	<form method="post">
 		<div class="form-input">
@@ -19,7 +25,7 @@
 		<input type="submit" value="No account? Sign up here">	<br/>			
 	</form>
 {{ else }}
-<h2>You are already logged in!</h2>
+<h2 class="notify-info">You are already logged in!</h2>
 <h3><a href="dashboard">Click here to return to safety</a></h3>
 
 {{end}}

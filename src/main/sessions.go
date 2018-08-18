@@ -11,6 +11,19 @@ import (
 	"github.com/gorilla/sessions"
 )
 
+const (
+	// FlashTypeInfo is to declare info flash cookies
+	FlashTypeInfo = 0
+	// FlashTypeErr is to declare error flash cookies
+	FlashTypeErr = 1
+)
+
+// FlashCookie contains flash data of a session
+type FlashCookie struct {
+	Type    int
+	Message string
+}
+
 // Cookies is where the cookies are stored.
 var cookies = sessions.NewCookieStore([]byte("33446a9dcf9ea060a0a6532b166da32f304af0de")) // todo
 
@@ -31,7 +44,8 @@ func loginHandle(w http.ResponseWriter, req *http.Request) {
 
 		// tell them to go away
 		if !ok {
-			http.Redirect(w, req, "/login?err=User doesn't exist", http.StatusSeeOther)
+			CreateFlashCookie(req, w, FlashTypeErr, "User doesn't exist")
+			http.Redirect(w, req, "/login", http.StatusSeeOther)
 			return
 		}
 
@@ -43,29 +57,23 @@ func loginHandle(w http.ResponseWriter, req *http.Request) {
 		}
 
 		// go away
-		http.Redirect(w, req, "/login?err=Invalid credentials", http.StatusSeeOther)
+		CreateFlashCookie(req, w, FlashTypeErr, "Invalid credentials")
+		http.Redirect(w, req, "/login", http.StatusSeeOther)
 		return
 	}
 
+	// Get their user and make an instance of view data
 	user, _, err := GetSessionedUser(req, w)
 	viewData := &ViewData{Viewer: user}
 
-	// Check if was logged out
-	_, isLogout := req.URL.Query()["logout"]
-	if isLogout {
-		viewData.Error = "Logged out"
-	}
-
-	// Questionable
-	oldError, ok := req.URL.Query()["err"]
-	if ok && len(oldError) == 1 {
-		viewData.Error = oldError[0]
-	}
+	// Get any flash cookies from previous loadings
+	LoadFlashCookies(req, w, viewData)
 
 	if err != nil {
 		viewData.Viewer = &User{Username: ""}
 	}
 
+	// Load template
 	err = templates.ExecuteTemplate(w, "login.html", viewData)
 	if err != nil {
 		log.Println("Error exectuing login template ", err)
@@ -83,7 +91,8 @@ func signupHandle(w http.ResponseWriter, req *http.Request) {
 
 		u, err := createUser(email, username, password)
 		if err != nil {
-			http.Redirect(w, req, "/signup?err="+err.Error(), http.StatusSeeOther)
+			CreateFlashCookie(req, w, FlashTypeErr, err.Error())
+			http.Redirect(w, req, "/signup", http.StatusSeeOther)
 			return
 		}
 
@@ -93,19 +102,14 @@ func signupHandle(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	// Get their session and create an instance of view data
 	user, _, err := GetSessionedUser(req, w)
 	viewData := &ViewData{Viewer: user}
 
-	// Questionable
-	oldError, ok := req.URL.Query()["err"]
-	if ok && len(oldError) == 1 {
-		viewData.Error = oldError[0]
-	}
+	// Get their flash data from previous sessions
+	LoadFlashCookies(req, w, viewData)
 
-	if err != nil {
-		viewData.Viewer = &User{Username: ""}
-	}
-
+	// Execute the template.
 	err = templates.ExecuteTemplate(w, "signup.html", viewData)
 	if err != nil {
 		log.Println("Error exectuing signup template ", err)
@@ -116,12 +120,15 @@ func signupHandle(w http.ResponseWriter, req *http.Request) {
 func logoutHandle(w http.ResponseWriter, req *http.Request) {
 	user, _, err := GetSessionedUser(req, w)
 	if err != nil {
-		http.Redirect(w, req, "/login?err="+err.Error(), http.StatusSeeOther)
+		CreateFlashCookie(req, w, FlashTypeErr, err.Error())
+		http.Redirect(w, req, "/login", http.StatusSeeOther)
 		return
 	}
 
+	// Clean them up
 	deleteCookie(user, req, w)
-	http.Redirect(w, req, "/login?logout", http.StatusSeeOther)
+	CreateFlashCookie(req, w, FlashTypeInfo, "logout")
+	http.Redirect(w, req, "/login", http.StatusSeeOther)
 }
 
 // GetSessionedUser gets user data, their session id and if an error occurs, that too
@@ -179,12 +186,6 @@ func createCookie(u *User, req *http.Request, w http.ResponseWriter) {
 	SessionData[newKey] = u
 }
 
-func createFlashCookie(req *http.Request, w http.ResponseWriter) {
-	session, err := cookies.Get(req, "session-id")
-	e
-
-}
-
 // Deletes a cookie by a user
 func deleteCookie(u *User, req *http.Request, w http.ResponseWriter) {
 	// Can't get data via GetSessionedUser as we need to get Session and expire it.
@@ -226,6 +227,40 @@ func deleteCookie(u *User, req *http.Request, w http.ResponseWriter) {
 		http.SetCookie(w, cookie)
 	}
 
+}
+
+// CreateFlashCookie creates a temporary cookie which is used to show tempoary notifications to them for the next reload
+func CreateFlashCookie(req *http.Request, w http.ResponseWriter, flashType int, contents string) {
+	session, _ := cookies.Get(req, "flash-data")
+	flashData := FlashCookie{
+		Type:    flashType,
+		Message: contents,
+	}
+	session.AddFlash(flashData)
+	err := session.Save(req, w)
+	if err != nil {
+		log.Println("[!!] Failed to save session after adding flash data: ", err)
+	}
+}
+
+// LoadFlashCookies loads in any created flash cookies and appends them to an instance of ViewData
+func LoadFlashCookies(req *http.Request, w http.ResponseWriter, viewData *ViewData) *ViewData {
+	session, _ := cookies.Get(req, "flash-data")
+	flashCookies := session.Flashes()
+	err := session.Save(req, w)
+	if err != nil {
+		log.Println("[!!] Failed to save session after reading flash data: ", err)
+	}
+
+	fCookies := make([]FlashCookie, len(flashCookies))
+
+	for index, flashCookie := range flashCookies {
+		fCookies[index] = flashCookie.(FlashCookie)
+	}
+
+	viewData.FlashData = fCookies
+
+	return viewData
 }
 
 // CheckAccess checks access of a requester ensuring they have rights to visit

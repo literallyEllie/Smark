@@ -17,6 +17,14 @@ a {
     color: rgb(240,128,128);
 }
 
+.notify-error {
+    color: rgb(255,99,71);
+}
+
+.notify-info {
+    color: rgb(51, 153, 102)
+}
+
 /* Side bar */
 .vertical-side {
     width: 60px;
@@ -27,7 +35,8 @@ a {
 .vertical-side a {
     background-color: rgb(186,85,211, 0.7);
     color: black;
-
+    display: block;
+    padding: 5px 0px 10px 5px; 
     text-decoration: none;
 }
 
@@ -63,7 +72,6 @@ a {
 }
 
 .center-container h2 {
-    color: rgb(255,99,71);
     padding-top: 5px;
     padding-bottom: 15px;
 }
