@@ -3,8 +3,10 @@ package main
 import (
 	"crypto/rand"
 	"encoding/base64"
+	"encoding/gob"
 	"errors"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 
@@ -25,10 +27,22 @@ type FlashCookie struct {
 }
 
 // Cookies is where the cookies are stored.
-var cookies = sessions.NewCookieStore([]byte("33446a9dcf9ea060a0a6532b166da32f304af0de")) // todo
+var cookies *sessions.CookieStore
 
 // SessionData is a map of all users with a valid cookie indexed by their session key
 var SessionData = map[string]*User{}
+
+func sessionsInit() {
+	// Load up hash for passwords
+	key, err := ioutil.ReadFile("sess_key.txt")
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+	cookies = sessions.NewCookieStore(key)
+
+	gob.Register(FlashCookie{})
+}
 
 // Client recv handles
 
@@ -50,7 +64,7 @@ func loginHandle(w http.ResponseWriter, req *http.Request) {
 		}
 
 		// check credentials
-		if (u.Username == username || u.Email == username) && u.Password == password {
+		if (u.Username == username || u.Email == username) && passMatch(u.Password, []byte(password)) {
 			createCookie(u, req, w)
 			http.Redirect(w, req, "/dashboard", http.StatusSeeOther)
 			return

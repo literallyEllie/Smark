@@ -2,6 +2,9 @@ package main
 
 import (
 	"errors"
+	"log"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 // UserDB is a temp map containing user data, an effective database
@@ -65,10 +68,15 @@ func createUser(email string, username string, password string) (*User, error) {
 		}
 	*/
 
+	securePass := hashSaltPassword([]byte(password))
+	if string(securePass) == password {
+		return nil, errors.New("Error securing password, try again later")
+	}
+
 	user := &User{
 		Email:    email,
 		Username: username,
-		Password: password,
+		Password: securePass,
 		IsAdmin:  false,
 	}
 	// UserDB[strings.ToLower(username)] = user
@@ -77,4 +85,24 @@ func createUser(email string, username string, password string) (*User, error) {
 	InsertUserDB(user)
 
 	return user, nil
+}
+
+func hashSaltPassword(password []byte) []byte {
+	hash, err := bcrypt.GenerateFromPassword(password, bcrypt.MinCost)
+	if err != nil {
+		log.Println("[!!] Error hashing password. ", err)
+		return password
+	}
+
+	return hash
+}
+
+func passMatch(hashed []byte, input []byte) bool {
+	err := bcrypt.CompareHashAndPassword(hashed, input)
+	if err != nil {
+		log.Println("[!!] Error comparing hashed password. ", err)
+		return false
+	}
+
+	return true
 }

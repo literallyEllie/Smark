@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/gob"
 	"html/template"
 	"io/ioutil"
 	"log"
@@ -25,7 +24,7 @@ type ViewData struct {
 type User struct {
 	Email    string `bson:"email"`
 	Username string `bson:"username"`
-	Password string `bson:"password"`
+	Password []byte `bson:"password"`
 	IsAdmin  bool   `bson:"isadmin"`
 }
 
@@ -36,10 +35,11 @@ func main() {
 	templates = populateTemplates()
 	regexEmail = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
 
+	// Init modules
+	sessionsInit()
 	dbInit()
 
-	gob.Register(FlashCookie{})
-
+	// Main handle
 	http.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
 		requestedPath := req.URL.Path[1:]
 		if requestedPath == "/" || requestedPath == "" {
