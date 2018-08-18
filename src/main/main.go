@@ -10,7 +10,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/gorilla/context"
+	gContext "github.com/gorilla/context"
 )
 
 const templatePath = "templates"
@@ -23,10 +23,10 @@ type ViewData struct {
 
 // User contains data about a user
 type User struct {
-	Email    string
-	Username string
-	Password string
-	IsAdmin  bool
+	Email    string `bson:"email"`
+	Username string `bson:"username"`
+	Password string `bson:"password"`
+	IsAdmin  bool   `bson:"isadmin"`
 }
 
 var templates *template.Template
@@ -36,22 +36,9 @@ func main() {
 	templates = populateTemplates()
 	regexEmail = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
 
-	createUser("test@cheese.com", "Test", "jkdgf")
-
-	adminAccount, _ := createUser("ellie@cheese.com", "ellie", "admin123")
-	adminAccount.IsAdmin = true
-	SaveAccount(adminAccount)
+	dbInit()
 
 	gob.Register(FlashCookie{})
-
-	// MongoDB Setup
-	// session, err := mgo.Dial("mongodb+srv://ellie:XXXXX@smark-gv8wv.gcp.mongodb.net/test")
-	// if err != nil {
-	// log.Panicf("Error connecting to database.", err)
-	// return
-	// }
-	// names := session.DatabaseNames
-	// log.Println("hi", names)
 
 	http.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
 		requestedPath := req.URL.Path[1:]
@@ -88,7 +75,7 @@ func main() {
 	http.HandleFunc("/logout", logoutHandle)
 	http.HandleFunc("/res/", handleResourceRequest)
 
-	http.ListenAndServe(":8080", context.ClearHandler(http.DefaultServeMux))
+	http.ListenAndServe(":8080", gContext.ClearHandler(http.DefaultServeMux))
 }
 
 // Method to handle requests to the resources folder

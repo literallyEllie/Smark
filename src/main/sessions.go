@@ -40,10 +40,10 @@ func loginHandle(w http.ResponseWriter, req *http.Request) {
 		password := req.FormValue("password")
 
 		// get from db
-		u, ok := UserDB[username]
+		u := GetAccount(username)
 
 		// tell them to go away
-		if !ok {
+		if u == nil {
 			CreateFlashCookie(req, w, FlashTypeErr, "User doesn't exist")
 			http.Redirect(w, req, "/login", http.StatusSeeOther)
 			return
@@ -127,7 +127,7 @@ func logoutHandle(w http.ResponseWriter, req *http.Request) {
 
 	// Clean them up
 	deleteCookie(user, req, w)
-	CreateFlashCookie(req, w, FlashTypeInfo, "logout")
+	CreateFlashCookie(req, w, FlashTypeInfo, "You have been logged out.")
 	http.Redirect(w, req, "/login", http.StatusSeeOther)
 }
 

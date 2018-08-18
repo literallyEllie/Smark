@@ -1,0 +1,7 @@
+{
+    "username": "username",
+    "pwd": "pass",
+    "host": "localhost",
+    "port": 27017,
+    "database": "smark"
+}
