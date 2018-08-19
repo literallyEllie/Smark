@@ -11,6 +11,7 @@ body {
     background: url("background.jpg");
     background-repeat: no-repeat;
     background-size: cover;
+    position: relative;
 }
 
 a {
@@ -27,31 +28,48 @@ a {
 
 /* Side bar */
 .vertical-side {
+    background: rgb(91,165,110);
+    background: rgba(70, 29, 140, .6);
     width: 60px;
-    height: 30px;
-    border-radius: 10px;
+    height: 100%;
+    position: fixed;
+    z-index: 1;
+    bottom: 0;
+    left: 0;
+    overflow-x: hidden;
 }
 
 .vertical-side a {
-    background-color: rgb(186,85,211, 0.7);
-    color: black;
+    color: white;
     display: block;
     padding: 5px 0px 10px 5px; 
-    text-decoration: none;
+    text-decoration: none; 
+    position: absolute;
+    bottom: 0;
 }
 
-/* Index */
+.vertical-side h1 {
+    font-style: normal;
+    color: rgb(255,255,0);
+    font-size: 15px;
+    padding-left: 2px;
+}
+
+/* Dashboard */
 .a-box {
     width: 450px;
     height: 150px;
     padding-top: 10px;
     padding-left: 20px;
     margin: 6em;
+    color: black;
     border-radius: 15px;
-    background: rgb(186,85,211, 0.7);
+    background: rgb(148, 46, 191);
+    background: rgba(194,193,191, 0.7);
 }
 
 .a-box i {
+    color: black;
     float: right;
     right: 0px;
     padding: 10px;
