@@ -71,7 +71,10 @@ func loginHandle(w http.ResponseWriter, req *http.Request) {
 		if u == nil {
 			CreateFlashCookie(req, w, FlashTypeErr, string(T(GetLocale(req), "error.user-no-exist")))
 			// Cache their credentials
-			CreateFlashCookie(req, w, FlashTypeDataUsername, username)
+			if username != "" {
+				CreateFlashCookie(req, w, FlashTypeDataUsername, username)
+			}
+
 			http.Redirect(w, req, "/login", http.StatusSeeOther)
 			return
 		}
@@ -124,8 +127,13 @@ func signupHandle(w http.ResponseWriter, req *http.Request) {
 		if err != "" {
 			CreateFlashCookie(req, w, FlashTypeErr, string(err))
 			// Cache credentials
-			CreateFlashCookie(req, w, FlashTypeDataEmail, email)
-			CreateFlashCookie(req, w, FlashTypeDataUsername, username)
+			if email != "" {
+				CreateFlashCookie(req, w, FlashTypeDataEmail, email)
+			}
+
+			if username != "" {
+				CreateFlashCookie(req, w, FlashTypeDataUsername, username)
+			}
 
 			http.Redirect(w, req, "/signup", http.StatusSeeOther)
 			return
@@ -274,7 +282,6 @@ func deleteCookie(u *User, req *http.Request, w http.ResponseWriter) {
 // ContainsKey is a method to check if a viewdata's flash data contains a key or not.
 func (data ViewData) ContainsKey(key string) bool {
 	if data.FlashData == nil {
-		log.Println("nil")
 		return false
 	}
 
