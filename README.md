@@ -16,4 +16,13 @@ Signup page: ![Signup page](https://i.imgur.com/UCspNC9.jpg)
 
 Users only! ![Users only page](https://i.imgur.com/sgAkBrm.jpg)
 
+## Dependencies
+ - [Gorilla Context](http://www.gorillatoolkit.org/pkg/context)
+ - [Crypto](https://golang.org/pkg/crypto/)
+ - [Mgo](https://godoc.org/github.com/globalsign/mgo)
+ - [yaml.v2](https://godoc.org/gopkg.in/yaml.v2)
+ - [i18n](https://godoc.org/github.com/qor/i18n)
+ - [MaxmindDB Reader](https://github.com/oschwald/maxminddb-golang)
+
+
 **Thank you for reading!!**

@@ -1,0 +1,30 @@
+CN:
+  login:
+    login-prompt: '您需要登录!'
+    logged-out: '您已注销。'
+    signup: '没有帐户？在此注册'
+    submit: '登录'
+    placeholder:
+      username-email: '输入您的用户名或电子邮件'
+      password: '输入密码'
+  signup:
+    welcome: '欢迎！'
+    submit: '注册'
+    login: '您登录了吗? 在这里登录'
+    placeholder:
+      email: '您的电子邮件'
+      username: '唯一用户名'
+      password: '秘密密码'
+  dashboard:
+    welcome: '欢迎返回 {{$1}} {{$2}}'
+  error:
+    logged-in: '您已登录!'
+    not-logged-in: '您没有登录。'
+    lost: '你看起来有点失落..。'
+    return-back: '点击这里返回安全'
+    email-invalid: '电子邮件无效'
+    email-used: '电子邮件在使用中'
+    username-invalid: '用户名无效'
+    username-used: '使用中的用户名'
+    password-invalid: '密码必须至少为6个字符'
+    cannot-hash: '保护密码时出错, 请稍后重试'

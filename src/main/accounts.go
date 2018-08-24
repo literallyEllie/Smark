@@ -1,11 +1,19 @@
 package main
 
 import (
-	"errors"
 	"log"
 
 	"golang.org/x/crypto/bcrypt"
 )
+
+// User contains data about a user
+type User struct {
+	Email    string `bson:"email"`
+	Username string `bson:"username"`
+	Password []byte `bson:"password"`
+	IsAdmin  bool   `bson:"isadmin"`
+	Locale   string `bson:"locale"`
+}
 
 // UserDB is a temp map containing user data, an effective database
 var UserDB = map[string]*User{}
@@ -33,28 +41,28 @@ func SaveAccount(user *User) {
 	UpdateUserDB(user)
 }
 
-func createUser(email string, username string, password string) (*User, error) {
+func createUser(locale string, email string, username string, password string) (*User, string) {
 	// Validation checks
 	if email == "" || !regexEmail.MatchString(email) {
-		return nil, errors.New("Email invalid")
+		return nil, string(T(locale, "error.email-invalid"))
 	}
 	if username == "" {
-		return nil, errors.New("Username invalid")
+		return nil, string(T(locale, "username.username-invalid"))
 	}
 	if len(password) < 6 {
-		return nil, errors.New("Password must be at least 6 characters")
+		return nil, string(T(locale, "error.password-invalid"))
 	}
 
 	// Check if in use
 
 	similarEmail := GetUserByEmail(email)
 	if similarEmail != nil {
-		return nil, errors.New("Email in-use")
+		return nil, string(T(locale, "error.email-used"))
 	}
 
 	similarUserName := GetUserByName(username)
 	if similarUserName != nil {
-		return nil, errors.New("Username in-use")
+		return nil, string(T(locale, "error.username-used"))
 	}
 
 	/*
@@ -70,7 +78,7 @@ func createUser(email string, username string, password string) (*User, error) {
 
 	securePass := hashSaltPassword([]byte(password))
 	if string(securePass) == password {
-		return nil, errors.New("Error securing password, try again later")
+		return nil, string(T(locale, "error.cannot-hash"))
 	}
 
 	user := &User{
@@ -84,7 +92,7 @@ func createUser(email string, username string, password string) (*User, error) {
 	// insert to db
 	InsertUserDB(user)
 
-	return user, nil
+	return user, ""
 }
 
 func hashSaltPassword(password []byte) []byte {

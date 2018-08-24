@@ -1,0 +1,32 @@
+US:
+  login:
+    login-prompt: 'You need to login!'
+    logged-out: 'You have been logged out.'
+    signup: 'No account? Signup here'
+    submit: 'Login'
+    placeholder:
+      username-email: 'Enter your username or email'
+      password: 'Enter your password'
+  signup:
+    welcome: 'Welcome!'
+    submit: 'Signup'
+    login: 'Done this? Login here'
+    placeholder:
+      email: 'Your email'
+      username: 'A unique username'
+      password: 'A secret password'
+  dashboard:
+    welcome: 'Welcome back, {{$1}} {{$2}}'
+  error:
+    logged-in: 'You are already logged in!'
+    not-logged-in: 'You were not logged in.'
+    lost: 'You look a bit lost...'
+    return-back: 'Click here to return to safety'
+    user-no-exist: 'User doesn''t exist'
+    invalid-credentials: 'Invalid credentials'
+    email-invalid: 'Email invalid'
+    email-used: 'Email in-use'
+    username-invalid: 'Username invalid'
+    username-used: 'Username in-use'
+    password-invalid: 'Password must be at least 6 characters'
+    cannot-hash: 'Error securing password, try again later'

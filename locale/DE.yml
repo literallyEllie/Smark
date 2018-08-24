@@ -1,0 +1,30 @@
+DE:
+  login:
+    login-prompt: 'Sie müssen sich anmelden!'
+    logged-out: 'Sie wurden abgemeldet.'
+    signup: 'Noch keinen Account? Melden Sie sich hier an'
+    submit: 'Anmeldung'
+    placeholder:
+      username-email: 'Tragen Sie hier Ihren Benutzernamen oder Ihre Emailadresse ein'
+      password: 'Geben Sie hier ihr Passwort ein'
+  signup:
+    welcome: 'Willkommen!'
+    submit: 'Anmelden'
+    login: 'Sind Sie fertig? Melden Sie sich hier an'
+    placeholder:
+      email: 'Ihre Emailadresse'
+      username: 'Einen einzigartigen Benutzernamen'
+      password: 'Ein geheimes Passwort'
+  dashboard:
+    welcome: 'Willkommen zurück, {{$1}} {{$2}}'
+  error:
+    logged-in: 'Sie sind schon angemeldet!'
+    not-logged-in: 'Die Anmeldung ist fehlgeschlagen.'
+    lost: 'Hast du dich vielleicht verirrt?'
+    return-back: 'Klicken Sie hier um in Sicherheit zu gelangen'
+    email-invalid: 'Emailadresse ungültig'
+    email-used: 'E-Mail-Adresse wird schon verwendet'
+    username-invalid: 'Benutzername ungültig'
+    username-used: 'Benutzername ist schon vergeben'
+    password-invalid: 'Das Passwort muss mindestens 6 Zeichen lang sein'
+    cannot-hash: 'Fehler beim Sichern des Passworts, versuchen Sie es später nochmal'

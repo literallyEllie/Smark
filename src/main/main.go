@@ -14,30 +14,18 @@ import (
 
 const templatePath = "templates"
 
-// ViewData is the data passed to the templates when a page is loaded.
-type ViewData struct {
-	Viewer    *User
-	FlashData []FlashCookie
-}
-
-// User contains data about a user
-type User struct {
-	Email    string `bson:"email"`
-	Username string `bson:"username"`
-	Password []byte `bson:"password"`
-	IsAdmin  bool   `bson:"isadmin"`
-}
-
 var templates *template.Template
 var regexEmail *regexp.Regexp
 
 func main() {
-	templates = populateTemplates()
 	regexEmail = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
 
 	// Init modules
 	sessionsInit()
 	dbInit()
+	initLocale()
+
+	templates = populateTemplates()
 
 	// Main handle
 	http.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
@@ -47,9 +35,9 @@ func main() {
 		}
 
 		// Get the page
-		template := templates.Lookup(requestedPath + ".html")
+		execTemplate := templates.Lookup(requestedPath + ".html")
 
-		if template != nil {
+		if execTemplate != nil {
 			// Check user has access to page
 			user, err := CheckAccess(w, req, requestedPath)
 
@@ -59,10 +47,14 @@ func main() {
 				viewData := &ViewData{Viewer: user}
 				LoadFlashCookies(req, w, viewData)
 
-				err = template.Execute(w, viewData)
+				log.Printf("locale %s", user.Locale)
+
+				err = execTemplate.Execute(w, viewData)
 				if err != nil {
 					log.Println("[!!] Failed to exectute template ", err)
 				}
+
+				return
 			}
 
 		} else {
@@ -100,13 +92,13 @@ func handleResourceRequest(w http.ResponseWriter, req *http.Request) {
 		contentType = "text/plain"
 	}
 
-	w.Header().Add("Content Type", contentType)
+	w.Header().Add("Content-Type", contentType)
 	w.Write(data)
 }
 
 // Method to get templates
 func populateTemplates() *template.Template {
-	result := template.New("templates")
+	result := template.New("templates").Funcs(template.FuncMap{"t": T})
 
 	templateFolder, _ := os.Open(templatePath)
 	defer templateFolder.Close()
@@ -121,7 +113,7 @@ func populateTemplates() *template.Template {
 
 	_, err := result.ParseFiles(*templatePaths...)
 	if err != nil {
-		log.Println("[!!] Failed to load templates ", err)
+		log.Println("[!!] Failed to load templates:", err)
 	}
 
 	return result

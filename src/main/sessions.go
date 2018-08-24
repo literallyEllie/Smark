@@ -18,7 +18,17 @@ const (
 	FlashTypeInfo = 0
 	// FlashTypeErr is to declare error flash cookies
 	FlashTypeErr = 1
+	// FlashTypeDataEmail is to declare stored data of an email
+	FlashTypeDataEmail = 2
+	// FlashTypeDataUsername is to declare stored data of a username
+	FlashTypeDataUsername = 3
 )
+
+// ViewData is the data passed to the templates when a page is loaded.
+type ViewData struct {
+	Viewer    *User
+	FlashData []FlashCookie
+}
 
 // FlashCookie contains flash data of a session
 type FlashCookie struct {
@@ -58,7 +68,11 @@ func loginHandle(w http.ResponseWriter, req *http.Request) {
 
 		// tell them to go away
 		if u == nil {
-			CreateFlashCookie(req, w, FlashTypeErr, "User doesn't exist")
+			CreateFlashCookie(req, w, FlashTypeErr, string(T(GetLocale(req), "error.user-no-exist")))
+			if username != "" {
+				// Cache their credentials
+				CreateFlashCookie(req, w, FlashTypeDataUsername, username)
+			}
 			http.Redirect(w, req, "/login", http.StatusSeeOther)
 			return
 		}
@@ -71,26 +85,29 @@ func loginHandle(w http.ResponseWriter, req *http.Request) {
 		}
 
 		// go away
-		CreateFlashCookie(req, w, FlashTypeErr, "Invalid credentials")
+		CreateFlashCookie(req, w, FlashTypeErr, string(T(GetLocale(req), "error.invalid-credentials")))
+
+		if username != "" {
+			// Cache their credentials
+			CreateFlashCookie(req, w, FlashTypeDataUsername, username)
+		}
 		http.Redirect(w, req, "/login", http.StatusSeeOther)
 		return
 	}
 
 	// Get their user and make an instance of view data
-	user, _, err := GetSessionedUser(req, w)
+	user, _, _ := GetSessionedUser(req, w)
 	viewData := &ViewData{Viewer: user}
+
+	log.Printf("login locale %s", user.Locale)
 
 	// Get any flash cookies from previous loadings
 	LoadFlashCookies(req, w, viewData)
 
-	if err != nil {
-		viewData.Viewer = &User{Username: ""}
-	}
-
 	// Load template
-	err = templates.ExecuteTemplate(w, "login.html", viewData)
-	if err != nil {
-		log.Println("Error exectuing login template ", err)
+	templateErr := templates.ExecuteTemplate(w, "login.html", viewData)
+	if templateErr != nil {
+		log.Println("Error exectuing login template:", templateErr)
 	}
 
 }
@@ -103,9 +120,17 @@ func signupHandle(w http.ResponseWriter, req *http.Request) {
 		username := req.FormValue("username")
 		password := req.FormValue("password")
 
-		u, err := createUser(email, username, password)
-		if err != nil {
-			CreateFlashCookie(req, w, FlashTypeErr, err.Error())
+		// TODO get their locale from browser
+		u, err := createUser(GetLocale(req), email, username, password)
+		if err != "" {
+			CreateFlashCookie(req, w, FlashTypeErr, string(err))
+			// Cache credentials
+			if email != "" {
+				CreateFlashCookie(req, w, FlashTypeDataEmail, email)
+			}
+			if username != "" {
+				CreateFlashCookie(req, w, FlashTypeDataUsername, username)
+			}
 			http.Redirect(w, req, "/signup", http.StatusSeeOther)
 			return
 		}
@@ -117,48 +142,51 @@ func signupHandle(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// Get their session and create an instance of view data
-	user, _, err := GetSessionedUser(req, w)
+	user, _, _ := GetSessionedUser(req, w)
 	viewData := &ViewData{Viewer: user}
+	log.Printf("signup locale %s", user.Locale)
 
 	// Get their flash data from previous sessions
 	LoadFlashCookies(req, w, viewData)
 
 	// Execute the template.
-	err = templates.ExecuteTemplate(w, "signup.html", viewData)
-	if err != nil {
-		log.Println("Error exectuing signup template ", err)
+	templateErr := templates.ExecuteTemplate(w, "signup.html", viewData)
+	if templateErr != nil {
+		log.Println("Error exectuing signup template ", templateErr)
 	}
 
 }
 
 func logoutHandle(w http.ResponseWriter, req *http.Request) {
 	user, _, err := GetSessionedUser(req, w)
-	if err != nil {
-		CreateFlashCookie(req, w, FlashTypeErr, err.Error())
+	if err != "" {
+		CreateFlashCookie(req, w, FlashTypeErr, err)
 		http.Redirect(w, req, "/login", http.StatusSeeOther)
 		return
 	}
 
 	// Clean them up
 	deleteCookie(user, req, w)
-	CreateFlashCookie(req, w, FlashTypeInfo, "You have been logged out.")
+	CreateFlashCookie(req, w, FlashTypeInfo, string(T(user.Locale, "login.logged-out")))
 	http.Redirect(w, req, "/login", http.StatusSeeOther)
 }
 
 // GetSessionedUser gets user data, their session id and if an error occurs, that too
-func GetSessionedUser(req *http.Request, w http.ResponseWriter) (*User, string, error) {
+func GetSessionedUser(req *http.Request, w http.ResponseWriter) (*User, string, string) {
 	session, err := cookies.Get(req, "session-id")
 	user := &User{Username: ""}
 
+	// TODO cache locale
 	if err != nil {
-		return user, "", err
+		user.Locale = GetLocale(req)
+		return user, "", err.Error()
 	}
 
 	// Get their session key id thing
 	sessionKeyRaw := session.Values["id"]
 	if sessionKeyRaw == nil {
-		// I know this goes against error conventions but it shows to the end user
-		return user, "", errors.New(" You were not logged in. ")
+		user.Locale = GetLocale(req)
+		return user, "", string(T(user.Locale, "error.not-logged-in"))
 	}
 	sessionKey := sessionKeyRaw.(string)
 
@@ -166,11 +194,15 @@ func GetSessionedUser(req *http.Request, w http.ResponseWriter) (*User, string, 
 
 	// If they aren't logged in
 	if !ok {
-		user = &User{Username: ""}
-		return user, "", errors.New(" You were not logged in. ")
+		user = &User{Username: "", Locale: GetLocale(req)}
+		return user, "", string(T(user.Locale, "error.not-logged-in"))
 	}
 
-	return user, sessionKey, nil
+	if user.Locale == "" {
+		user.Locale = GetLocale(req)
+	}
+
+	return user, sessionKey, ""
 }
 
 // Session assignment
@@ -284,9 +316,9 @@ func CheckAccess(w http.ResponseWriter, req *http.Request, reqPage string) (*Use
 	user, _, err := GetSessionedUser(req, w)
 
 	// If they're not logged in (i.e in SessionData) and they're not already trying to login, tell them to go away.
-	if err != nil && !(reqPage == "login" || reqPage == "signup" || reqPage == "404") {
+	if err != "" && !(reqPage == "login" || reqPage == "signup" || reqPage == "404") {
 		http.Redirect(w, req, "/login", http.StatusSeeOther)
-		return user, err
+		return user, errors.New(err)
 	}
 
 	// Return their data and its all gucci

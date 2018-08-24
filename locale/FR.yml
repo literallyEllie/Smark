@@ -1,0 +1,30 @@
+FR:
+  login:
+    login-prompt: 'You need to login!'
+    logged-out: 'You have been logged out.'
+    signup: 'No account? Signup here'
+    submit: 's''identifier'
+    placeholder:
+      username-email: 'Entrez votre nom d''utilisateur ou email'
+      password: "Tapez votre mot de passe\n"
+  signup:
+    welcome: 'Bienvenue!'
+    submit: 'Signup'
+    login: 'Done this? Login here'
+    placeholder:
+      email: 'Votre email'
+      username: 'A unique username'
+      password: 'A secret password'
+  dashboard:
+    welcome: 'Welcome back, {{$1}} {{$2}}'
+  error:
+    logged-in: 'You are already logged in!'
+    not-logged-in: 'Vous n''étiez pas connecté'
+    lost: 'You look a bit lost...'
+    return-back: 'Click here to return to safety'
+    email-invalid: 'Email invalide'
+    email-used: 'Email in-use'
+    username-invalid: 'Username invalid'
+    username-used: 'Username in-use'
+    password-invalid: 'Password must be at least 6 characters'
+    cannot-hash: 'Error securing password, try again later'

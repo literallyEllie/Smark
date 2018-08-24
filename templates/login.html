@@ -7,27 +7,37 @@
 		{{ range .FlashData }}
 			{{ if eq .Type 1 }}
 				<h2 class="notify-error">{{ .Message }}</h2>
-			{{ else }}
+			{{ else if eq .Type 0 }}
 				<h2 class="notify-info">{{ .Message }}</h2>
 			{{ end }}
 		{{ end }}
 	{{ else }}
-		<h2 class="notify-info">You need to login!</h2>
+		<h2 class="notify-info">{{ t .Viewer.Locale "login.login-prompt" }}</h2>
 	{{ end }}
 	<form method="post">
 		<div class="form-input">
-			<input type="text" id="username" name="username" placeholder="Enter username or email" autofocus required><br />
-			<input type="password" id="password" name="password" placeholder="Enter password" required><br />
-			<input type="submit" value="Login">	<br/>	
+		{{ if .FlashData }}
+			{{ range .FlashData }}
+				<h1>{{ .Type }} - {{ .Message }}</h1>
+				{{ if eq .Type 3 }}
+					<input type="text" id="username" name="username" value={{ .Message }} placeholder={{ t $.Viewer.Locale "login.placeholder.username-email" }} autofocus required><br />
+				{{ end }}
+			{{ end }}
+		{{ else }}
+			<input type="text" id="username" name="username" placeholder={{ t .Viewer.Locale "login.placeholder.username-email" }} autofocus required><br />
+		{{ end }}
+			<input type="password" id="password" name="password" placeholder={{ t .Viewer.Locale "login.placeholder.password" }} required><br />
+			<input type="submit" value={{ t .Viewer.Locale "login.submit" }}><br/>	
 		</div>
 	</form>
 	<form action="/signup">
-		<input type="submit" value="No account? Sign up here">	<br/>			
+		<input type="submit" value={{ t .Viewer.Locale "login.signup" }}><br/>			
 	</form>
-{{ else }}
-<h2 class="notify-info">You are already logged in!</h2>
-<h3><a href="dashboard">Click here to return to safety</a></h3>
 
+{{ else }}
+<h2 class="notify-info">{{ t .Viewer.Locale "error.logged-in" }}</h2>
+<h3><a href="index">{{ t .Viewer.Locale "error.return-back" }}</a></h3>
 {{end}}
+
 </div>
 {{ template "footer" . }}

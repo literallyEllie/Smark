@@ -2,7 +2,7 @@
 
 <div class="center-container">
 	<h1>Smark</h1>
-	<h2 class="notify-info">You look a bit lost...<h2>
-	<h3><a href="dashboard">Click here to return to safety</a></h3>
+	<h2 class="notify-info">{{ t .Viewer.Locale "error.lost" }}<h2>
+	<h3><a href="dashboard">{{ t .Viewer.Locale "error.return-back" }}</a></h3>
 </div>
 {{ template "footer" . }}

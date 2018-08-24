@@ -7,27 +7,37 @@
 		{{ range .FlashData }}
 			{{ if eq .Type 1 }}
 				<h2 class="notify-error">{{ .Message }}</h2>
-			{{ else }}
+			{{ else if eq .Type 0 }}
 				<h2 class="notify-info">{{ .Message }}</h2>
 			{{ end }}
 		{{ end }}
 	{{ else }}
-		<h2 class="notify-info">Welcome!</h2>
+		<h2 class="notify-info">{{ t .Viewer.Locale "signup.welcome" }}</h2>
 	{{ end }}
 	<form method="post">
 		<div class="form-input">
-			<input type="email" id="email" name="email" placeholder="Your email" autofocus required><br />
-			<input type="text" id="username" name="username" placeholder="A unique username" autofocus required><br />
-			<input type="password" id="password" name="password" placeholder="A secret password" required><br />
-			<input type="submit" value="Signup"> <br/>	
+		{{ if .FlashData }}
+			{{ range .FlashData }}
+				{{ if eq .Type 2 }}
+					<input type="email" id="email" name="email" value={{.Message}} placeholder={{ t $.Viewer.Locale "signup.placeholder.email" }} autofocus required><br />
+				{{ else if eq .Type 3 }}
+					<input type="text" id="username" name="username" value={{.Message}} placeholder={{ t $.Viewer.Locale "signup.placeholder.username" }} autofocus required><br />
+				{{ end }}
+			{{ end }}
+		{{ else }}
+			<input type="email" id="email" name="email" placeholder={{ t .Viewer.Locale "signup.placeholder.email" }} autofocus required><br />
+			<input type="text" id="username" name="username" placeholder={{ t .Viewer.Locale "signup.placeholder.username" }} autofocus required><br />
+		{{ end }}
+			<input type="password" id="password" name="password" placeholder={{ t .Viewer.Locale "signup.placeholder.password" }} required><br />
+			<input type="submit" value={{ t .Viewer.Locale "signup.submit" }}> <br/>	
 		</div>
 	</form>
 	<form action="/login">
-		<input type="submit" value="Done this? Login here">	<br/>			
+		<input type="submit" value={{ t .Viewer.Locale "signup.login" }}>	<br/>			
 	</form>
 {{ else }}
-<h2 class="notify-info">You are already logged in!</h2>
-<h3><a href="index">Click here to return to safety</a></h3>
+<h2 class="notify-info">{{ t .Viewer.Locale "error.logged-in" }}</h2>
+<h3><a href="index">{{ t .Viewer.Locale "error.return-back" }}</a></h3>
 
 {{end}}
 </div>

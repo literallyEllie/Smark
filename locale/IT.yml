@@ -1,0 +1,30 @@
+IT:
+  login:
+    login-prompt: 'È necessario effettuare l’accesso!'
+    logged-out: 'Sei stato disconnesso.'
+    signup: 'Non hai l’account? Registrati qui'
+    submit: 'Accedi'
+    placeholder:
+      username-email: 'Inserisci il tuo username o email'
+      password: 'Inserisci la password'
+  signup:
+    welcome: 'Benvenuto!'
+    submit: 'Registrati'
+    login: 'Fatto? Accedi'
+    placeholder:
+      email: 'La tua email'
+      username: 'Un username unico'
+      password: 'Una password segreta'
+  dashboard:
+    welcome: 'Bentornato, {{$1}} {{$2}}'
+  error:
+    logged-in: 'Hai già effettuato l’accesso!'
+    not-logged-in: 'Non avevi effettuato l’accesso.'
+    lost: 'Sembra che tu ti sia perso...'
+    return-back: 'Clicca qui per tornare in salvo'
+    email-invalid: 'Email invalida'
+    email-used: 'Email già in uso'
+    username-invalid: 'Username invalido'
+    username-used: 'Username già in uso'
+    password-invalid: 'La password deve avere almeno 6 caratteri'
+    cannot-hash: 'Errore, non è stato possibile mettere in sicurezza la password, riprova più tardi'

@@ -1,0 +1,30 @@
+"NO":
+  login:
+    login-prompt: 'Du må logge inn!'
+    logged-out: 'Du har blitt logget ut.'
+    signup: 'Ingen konto? Registrer deg'
+    submit: 'Logg inn'
+    placeholder:
+      username-email: 'Skriv inn brukernavnet ditt eller e-post'
+      password: 'Skriv inn passordet ditt'    
+  signup:
+    welcome: 'Velkommen!'
+    submit: 'Registrer deg'
+    login: 'Har du en konto? Klikk for å logge inn'
+    placeholder:
+      email: 'Din e-post'
+      username: 'Et unikt brukernavn'
+      password: 'Et hemmelig passord'
+  dashboard:
+    welcome: 'Velkommen tilbake, {{$1}} {{$2}}'
+  error:
+    logged-in: 'Du er allerede innlogget!'
+    not-logged-in: 'Du var ikke logget inn.'
+    lost: 'Du ser litt fortapt ut...'
+    return-back: 'Klikk her for å returnere til sikkerhet'
+    email-invalid: 'E-post invalid'
+    email-used: 'E-post i bruk'
+    username-invalid: 'Brukernavn ugyldig'
+    username-used: 'Brukernavn i bruk'
+    password-invalid: 'Passordet må være minst 6 tegn langt'
+    cannot-hash: 'Mislykket å sikre passordet, prøv igjen senere'

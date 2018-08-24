@@ -1,0 +1,30 @@
+da:
+  login:
+    login-prompt: 'Du skal logge ind!'
+    logged-out: 'Du er logget ud.'
+    signup: 'Ingen konto? Tilmeld dig her'
+    submit: 'Log På'
+    placeholder:
+      username-email: 'Indtast dit brugernavn eller din email-konto'
+      password: 'Indtast din adgangskode'
+  signup:
+    welcome: 'Velkommen!'
+    submit: 'Tilmelding'
+    login: 'Har du en konto? Log På her'
+    placeholder:
+      email: 'Din e-mail'
+      username: 'Unikt Brugernavn'
+      password: 'Hemmelig adgangskode'
+  dashboard:
+    welcome: 'Velkommen tilbage, {{$1}} {{$2}}'
+  error:
+    logged-in: 'Du er allerede logget ind!'
+    not-logged-in: 'Der er sket en fejl, du blev ikke logget på.'
+    lost: 'You look a bit lost...'
+    return-back: 'Klik her for at vende tilbage'
+    email-invalid: 'Ugyldig email'
+    email-used: 'E-mail i brug'
+    username-invalid: 'Brugernavn ugyldig'
+    username-used: 'Brugernavn i brug'
+    password-invalid: 'Adgangskoden skal være på mindst 6 tegn'
+    cannot-hash: 'Der er sket en fejl, prøv igen senere'
