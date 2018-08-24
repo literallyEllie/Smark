@@ -3,31 +3,37 @@
 <div class="center-container">
 	<h1>Smark</h1>
 {{ if eq .Viewer.Username "" }}
-	{{ if .FlashData }}
-		{{ range .FlashData }}
-			{{ if eq .Type 1 }}
-				<h2 class="notify-error">{{ .Message }}</h2>
-			{{ else if eq .Type 0 }}
-				<h2 class="notify-info">{{ .Message }}</h2>
-			{{ end }}
+	{{ range $type, $content := .FlashData }}
+		{{ if eq $type "err" }}
+			<h2 class="notify-error">{{ $content }}</h2>
+		{{ else if eq $type "info" }}
+			<h2 class="notify-info">{{ $content }}</h2>
 		{{ end }}
 	{{ else }}
 		<h2 class="notify-info">{{ t .Viewer.Locale "signup.welcome" }}</h2>
 	{{ end }}
 	<form method="post">
 		<div class="form-input">
-		{{ if .FlashData }}
-			{{ range .FlashData }}
-				{{ if eq .Type 2 }}
-					<input type="email" id="email" name="email" value={{.Message}} placeholder={{ t $.Viewer.Locale "signup.placeholder.email" }} autofocus required><br />
-				{{ else if eq .Type 3 }}
-					<input type="text" id="username" name="username" value={{.Message}} placeholder={{ t $.Viewer.Locale "signup.placeholder.username" }} autofocus required><br />
+		{{ if .ContainsKey "email" }} 
+			{{ range $type, $content := .FlashData }}
+				{{ if eq $type "email" }}
+					<input type="email" id="email" name="email" value={{$content}} placeholder={{ t $.Viewer.Locale "signup.placeholder.email" }} autofocus required><br />	
 				{{ end }}
 			{{ end }}
 		{{ else }}
 			<input type="email" id="email" name="email" placeholder={{ t .Viewer.Locale "signup.placeholder.email" }} autofocus required><br />
-			<input type="text" id="username" name="username" placeholder={{ t .Viewer.Locale "signup.placeholder.username" }} autofocus required><br />
 		{{ end }}
+		
+		{{ if .ContainsKey "uname" }} 
+			{{ range $type, $content := .FlashData }}
+				{{ if eq $type "uname" }}
+					<input type="text" id="username" name="username" value={{$content}} placeholder={{ t $.Viewer.Locale "signup.placeholder.username" }} autofocus required><br />
+				{{ end }}
+			{{ end }}
+		{{ else }}
+			<input type="text" id="username" name="username" placeholder={{ t .Viewer.Locale "signup.placeholder.username" }} autofocus required><br />ofocus required><br />
+		{{ end }}
+
 			<input type="password" id="password" name="password" placeholder={{ t .Viewer.Locale "signup.placeholder.password" }} required><br />
 			<input type="submit" value={{ t .Viewer.Locale "signup.submit" }}> <br/>	
 		</div>

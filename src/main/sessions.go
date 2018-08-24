@@ -15,25 +15,26 @@ import (
 
 const (
 	// FlashTypeInfo is to declare info flash cookies
-	FlashTypeInfo = 0
+	FlashTypeInfo = "info"
 	// FlashTypeErr is to declare error flash cookies
-	FlashTypeErr = 1
+	FlashTypeErr = "err"
 	// FlashTypeDataEmail is to declare stored data of an email
-	FlashTypeDataEmail = 2
+	FlashTypeDataEmail = "email"
 	// FlashTypeDataUsername is to declare stored data of a username
-	FlashTypeDataUsername = 3
+	FlashTypeDataUsername = "uname"
 )
 
 // ViewData is the data passed to the templates when a page is loaded.
 type ViewData struct {
-	Viewer    *User
-	FlashData []FlashCookie
+	Viewer *User
+	// FlashData []FlashCookie
+	FlashData map[string]string
 }
 
 // FlashCookie contains flash data of a session
 type FlashCookie struct {
-	Type    int
-	Message string
+	Key     string
+	Content string
 }
 
 // Cookies is where the cookies are stored.
@@ -69,10 +70,8 @@ func loginHandle(w http.ResponseWriter, req *http.Request) {
 		// tell them to go away
 		if u == nil {
 			CreateFlashCookie(req, w, FlashTypeErr, string(T(GetLocale(req), "error.user-no-exist")))
-			if username != "" {
-				// Cache their credentials
-				CreateFlashCookie(req, w, FlashTypeDataUsername, username)
-			}
+			// Cache their credentials
+			CreateFlashCookie(req, w, FlashTypeDataUsername, username)
 			http.Redirect(w, req, "/login", http.StatusSeeOther)
 			return
 		}
@@ -125,12 +124,9 @@ func signupHandle(w http.ResponseWriter, req *http.Request) {
 		if err != "" {
 			CreateFlashCookie(req, w, FlashTypeErr, string(err))
 			// Cache credentials
-			if email != "" {
-				CreateFlashCookie(req, w, FlashTypeDataEmail, email)
-			}
-			if username != "" {
-				CreateFlashCookie(req, w, FlashTypeDataUsername, username)
-			}
+			CreateFlashCookie(req, w, FlashTypeDataEmail, email)
+			CreateFlashCookie(req, w, FlashTypeDataUsername, username)
+
 			http.Redirect(w, req, "/signup", http.StatusSeeOther)
 			return
 		}
@@ -275,12 +271,28 @@ func deleteCookie(u *User, req *http.Request, w http.ResponseWriter) {
 
 }
 
+// ContainsKey is a method to check if a viewdata's flash data contains a key or not.
+func (data ViewData) ContainsKey(key string) bool {
+	if data.FlashData == nil {
+		log.Println("nil")
+		return false
+	}
+
+	for k := range data.FlashData {
+		if k == key {
+			return true
+		}
+	}
+
+	return false
+}
+
 // CreateFlashCookie creates a temporary cookie which is used to show tempoary notifications to them for the next reload
-func CreateFlashCookie(req *http.Request, w http.ResponseWriter, flashType int, contents string) {
+func CreateFlashCookie(req *http.Request, w http.ResponseWriter, flashType string, contents string) {
 	session, _ := cookies.Get(req, "flash-data")
 	flashData := FlashCookie{
-		Type:    flashType,
-		Message: contents,
+		Key:     flashType,
+		Content: contents,
 	}
 	session.AddFlash(flashData)
 	err := session.Save(req, w)
@@ -298,13 +310,16 @@ func LoadFlashCookies(req *http.Request, w http.ResponseWriter, viewData *ViewDa
 		log.Println("[!!] Failed to save session after reading flash data: ", err)
 	}
 
-	fCookies := make([]FlashCookie, len(flashCookies))
-
-	for index, flashCookie := range flashCookies {
-		fCookies[index] = flashCookie.(FlashCookie)
+	if len(flashCookies) < 1 {
+		return viewData
 	}
 
-	viewData.FlashData = fCookies
+	viewData.FlashData = make(map[string]string, len(flashCookies))
+
+	for _, flashCookie := range flashCookies {
+		cookie := flashCookie.(FlashCookie)
+		viewData.FlashData[cookie.Key] = cookie.Content
+	}
 
 	return viewData
 }
