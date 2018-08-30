@@ -15,7 +15,7 @@
 	<form method="post">
 		<div class="form-input">
 		{{ if .ContainsKey "uname" }}
-			<input type="text" id="username" name="username" value={{ index .FlashMap "uname" }} placeholder={{ t $.Viewer.Locale "login.placeholder.username-email" }} autofocus required><br />
+			<input type="text" id="username" name="username" value={{ index .FlashData "uname" }} placeholder={{ t $.Viewer.Locale "login.placeholder.username-email" }} autofocus required><br />
 		{{ else }}
 			<input type="text" id="username" name="username" placeholder={{ t .Viewer.Locale "login.placeholder.username-email" }} autofocus required><br />
 		{{ end }}

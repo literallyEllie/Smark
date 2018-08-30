@@ -14,26 +14,16 @@
 	{{ end }}
 	<form method="post">
 		<div class="form-input">
-		{{ if .ContainsKey "email" }} 
-			{{ range $type, $content := .FlashData }}
-				{{ if eq $type "email" }}
-					<input type="email" id="email" name="email" value={{$content}} placeholder={{ t $.Viewer.Locale "signup.placeholder.email" }} autofocus required><br />	
-				{{ end }}
-			{{ end }}
+		{{ if .ContainsKey "email" }}
+			<input type="email" id="email" name="email" value={{ index .FlashData "email" }} placeholder={{ t $.Viewer.Locale "signup.placeholder.email" }} autofocus required><br />
 		{{ else }}
-			<input type="email" id="email" name="email" placeholder={{ t .Viewer.Locale "signup.placeholder.email" }} autofocus required><br />
-		{{ end }}
-		
-		{{ if .ContainsKey "uname" }} 
-			{{ range $type, $content := .FlashData }}
-				{{ if eq $type "uname" }}
-					<input type="text" id="username" name="username" value={{$content}} placeholder={{ t $.Viewer.Locale "signup.placeholder.username" }} autofocus required><br />
-				{{ end }}
-			{{ end }}
+			<input type="email" id="email" name="email" placeholder={{ t $.Viewer.Locale "signup.placeholder.email" }} autofocus required><br />
+		{{ end }}	
+		{{ if .ContainsKey "uname" }}
+			<input type="text" id="username" name="username" value={{ index .FlashData "uname" }} placeholder={{ t $.Viewer.Locale "signup.placeholder.username" }} autofocus required><br />
 		{{ else }}
-			<input type="text" id="username" name="username" placeholder={{ t .Viewer.Locale "signup.placeholder.username" }} autofocus required><br />ofocus required><br />
+			<input type="text" id="username" name="username" placeholder={{ t $.Viewer.Locale "signup.placeholder.username" }} autofocus required><br />
 		{{ end }}
-
 			<input type="password" id="password" name="password" placeholder={{ t .Viewer.Locale "signup.placeholder.password" }} required><br />
 			<input type="submit" value={{ t .Viewer.Locale "signup.submit" }}> <br/>	
 		</div>

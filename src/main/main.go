@@ -47,8 +47,6 @@ func main() {
 				viewData := &ViewData{Viewer: user}
 				LoadFlashCookies(req, w, viewData)
 
-				log.Printf("locale %s", user.Locale)
-
 				err = execTemplate.Execute(w, viewData)
 				if err != nil {
 					log.Println("[!!] Failed to exectute template ", err)

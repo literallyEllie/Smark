@@ -101,8 +101,6 @@ func loginHandle(w http.ResponseWriter, req *http.Request) {
 	user, _, _ := GetSessionedUser(req, w)
 	viewData := &ViewData{Viewer: user}
 
-	log.Printf("login locale %s", user.Locale)
-
 	// Get any flash cookies from previous loadings
 	LoadFlashCookies(req, w, viewData)
 
@@ -148,7 +146,7 @@ func signupHandle(w http.ResponseWriter, req *http.Request) {
 	// Get their session and create an instance of view data
 	user, _, _ := GetSessionedUser(req, w)
 	viewData := &ViewData{Viewer: user}
-	log.Printf("signup locale %s", user.Locale)
+	// log.Printf("signup locale %s", user.Locale)
 
 	// Get their flash data from previous sessions
 	LoadFlashCookies(req, w, viewData)
@@ -234,6 +232,7 @@ func createCookie(u *User, req *http.Request, w http.ResponseWriter) {
 	cookies.Save(req, w, session)
 	// Map session key to user
 	SessionData[newKey] = u
+	GuestLocaleCache[GetIP(req)] = u.Locale
 }
 
 // Deletes a cookie by a user
@@ -292,6 +291,22 @@ func (data ViewData) ContainsKey(key string) bool {
 	}
 
 	return false
+}
+
+// GetFlashKey tries to get a flash data by the key
+func (data ViewData) GetFlashKey(key string) string {
+	if data.FlashData == nil {
+		return ""
+	}
+
+	for k := range data.FlashData {
+		if k == key {
+			log.Println(k)
+			return k
+		}
+	}
+
+	return "\""
 }
 
 // CreateFlashCookie creates a temporary cookie which is used to show tempoary notifications to them for the next reload

@@ -1,4 +1,3 @@
 Think of something more to put on the sidebar for the dashboard
 Ablility to see other profiles
 Follows/Friends ?
-Cache guest locale
