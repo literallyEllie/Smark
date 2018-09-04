@@ -6,7 +6,7 @@ GB:
     submit: 'Login'
     placeholder:
       username-email: 'Enter your username or email'
-      password: 'Enter your password'    
+      password: 'Enter your password'
   signup:
     welcome: 'Welcome!'
     submit: 'Signup'
@@ -16,12 +16,19 @@ GB:
       username: 'A unique username'
       password: 'A secret password'
   dashboard:
-    welcome: 'Welcome back, {{$1}} {{$2}}'
+    welcome: 'Welcome back, {{$1}}'
+  profile:
+    header: 'Profile of: {{$1}}'
+    activity:
+      online: 'Online'
+      offline: 'Offline (Since {{$1}} ago)'
   error:
     logged-in: 'You are already logged in!'
     not-logged-in: 'You were not logged in.'
     lost: 'You look a bit lost...'
     return-back: 'Click here to return to safety'
+    user-no-exist: 'User doesn''t exist'
+    invalid-credentials: 'Invalid credentials'
     email-invalid: 'Email invalid'
     email-used: 'Email in-use'
     username-invalid: 'Username invalid'

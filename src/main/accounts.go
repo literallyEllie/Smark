@@ -2,21 +2,46 @@ package main
 
 import (
 	"log"
+	"time"
 
 	"golang.org/x/crypto/bcrypt"
 )
 
 // User contains data about a user
 type User struct {
+	// Credentials
 	Email    string `bson:"email"`
 	Username string `bson:"username"`
 	Password []byte `bson:"password"`
-	IsAdmin  bool   `bson:"isadmin"`
-	Locale   string `bson:"locale"`
+
+	// Activity
+	Online   bool
+	LastSeen time.Time `bson:"lastseen"`
+
+	// Misc
+	IsAdmin bool   `bson:"isadmin"`
+	Locale  string `bson:"locale"`
+}
+
+// QualifiedName returns their qualified name including their prefix tag, if applicable.
+func (user User) QualifiedName() string {
+	if user.IsAdmin {
+		return user.Prefix() + " " + user.Username
+	}
+
+	return user.Username
+}
+
+// Prefix returns a prefix for the user
+func (user User) Prefix() string {
+	if user.IsAdmin {
+		return "[ADMIN]"
+	}
+	return ""
 }
 
 // UserDB is a temp map containing user data, an effective database
-var UserDB = map[string]*User{}
+// var UserDB = map[string]*User{}
 
 // GetAccount gets a user from the database with the given query and returns them
 func GetAccount(query string) *User {
@@ -86,6 +111,7 @@ func createUser(locale string, email string, username string, password string) (
 		Username: username,
 		Password: securePass,
 		IsAdmin:  false,
+		Online:   true,
 	}
 	// UserDB[strings.ToLower(username)] = user
 

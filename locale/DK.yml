@@ -16,7 +16,7 @@ da:
       username: 'Unikt Brugernavn'
       password: 'Hemmelig adgangskode'
   dashboard:
-    welcome: 'Velkommen tilbage, {{$1}} {{$2}}'
+    welcome: 'Velkommen tilbage, {{$1}}'
   error:
     logged-in: 'Du er allerede logget ind!'
     not-logged-in: 'Der er sket en fejl, du blev ikke logget på.'

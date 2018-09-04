@@ -17,11 +17,18 @@ IT:
       password: 'Una password segreta'
   dashboard:
     welcome: 'Bentornato, {{$1}} {{$2}}'
+  profile:
+    header: 'Profilo di: {{$1}}'
+    activity:
+      online: 'Online'
+      offline: 'Offilne (da {{$1}} ore)'
   error:
     logged-in: 'Hai già effettuato l’accesso!'
     not-logged-in: 'Non avevi effettuato l’accesso.'
     lost: 'Sembra che tu ti sia perso...'
     return-back: 'Clicca qui per tornare in salvo'
+    user-no-exist: 'L’utente non esiste'
+    invalid-credentials: 'Credenziali invalide'
     email-invalid: 'Email invalida'
     email-used: 'Email già in uso'
     username-invalid: 'Username invalido'

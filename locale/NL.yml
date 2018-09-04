@@ -17,11 +17,18 @@ NL:
       password: 'Een geheim wachtwoord'
   dashboard:
     welcome: 'Welkom terug, {{$1}} {{$2}}'
+  profile:
+    header: 'Profiel van: {{$1}}'
+    activity:
+      online: 'Online'
+      offline: 'Offline (Sinds {{$1}} geleden)'
   error:
     logged-in: 'U bent al ingelogd!'
     not-logged-in: 'U was niet ingelogd.'
     lost: 'U ziet er een beetje verdwaald uit...'
     return-back: 'Klik hier om weer in veiligheid te zijn'
+    user-no-exist: 'Gebruiker bestaat niet'
+    invalid-credentials: 'Gegevens onjuist'
     email-invalid: 'E-mailadres ongeldig'
     email-used: 'E-mailadres al in gebruik'
     username-invalid: 'Gebruikersnaam ongeldig'

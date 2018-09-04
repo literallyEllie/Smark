@@ -16,7 +16,7 @@ ES:
       username: 'A unique username'
       password: 'A secret password'
   dashboard:
-    welcome: 'Welcome back, {{$1}} {{$2}}'
+    welcome: 'Welcome back, {{$1}}'
   error:
     logged-in: 'You are already logged in!'
     not-logged-in: 'You were not logged in.'

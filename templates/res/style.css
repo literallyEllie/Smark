@@ -53,6 +53,16 @@ a {
     color: rgb(255,255,0);
     font-size: 15px;
     padding-left: 2px;
+    bottom: auto;
+}
+
+.branding a {
+    font-family: Verdana;
+    bottom: auto;
+    color: inherit;
+    position: initial;
+    display: initial;
+    padding: 5px 0px 0px 0px; 
 }
 
 /* Dashboard */
@@ -73,6 +83,22 @@ a {
     float: right;
     right: 0px;
     padding: 10px;
+    position: static;
+}
+
+/* Profile View */
+.status {
+   float: right;
+   padding-right: 10px;
+   font-size: 12px;
+}
+
+.status.online {
+    color: green;
+}
+
+.status.offline {
+    color: red;
 }
 
 /* Center boxes!  */

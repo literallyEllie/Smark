@@ -16,7 +16,12 @@ US:
       username: 'A unique username'
       password: 'A secret password'
   dashboard:
-    welcome: 'Welcome back, {{$1}} {{$2}}'
+    welcome: 'Welcome back, {{$1}}'
+  profile:
+    header: 'Profile of: {{$1}}'
+    activity:
+      online: 'Online'
+      offline: 'Offline (Since {{$1}} ago)'
   error:
     logged-in: 'You are already logged in!'
     not-logged-in: 'You were not logged in.'

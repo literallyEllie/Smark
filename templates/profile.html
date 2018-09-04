@@ -1,0 +1,13 @@
+{{ template "header" . }}
+{{ template "main" . }}
+<div class="a-box">
+
+    <h3>{{ t .Viewer.Locale "profile.header" .ProfileView.Owner.QualifiedName }}
+        {{ if .ProfileView.Owner.Online }}<span class="status online">{{t .Viewer.Locale "profile.activity.online" }}</span>{{ else }}
+        <span class="status offline">{{t .Viewer.Locale "profile.activity.offline" "100 years" }}</span>
+        {{ end }}</h3>
+
+    <i class="fas fa-user-alt fa-5x" aria-hidden="true"></i>
+
+</div>
+{{ template "footer" . }}

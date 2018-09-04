@@ -16,7 +16,7 @@ CN:
       username: '唯一用户名'
       password: '秘密密码'
   dashboard:
-    welcome: '欢迎返回 {{$1}} {{$2}}'
+    welcome: '欢迎返回 {{$1}}'
   error:
     logged-in: '您已登录!'
     not-logged-in: '您没有登录。'

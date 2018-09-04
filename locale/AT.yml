@@ -17,11 +17,18 @@ AT:
       password: 'Ein geheimes Passwort'
   dashboard:
     welcome: 'Willkommen zurück, {{$1}} {{$2}}'
+  profile:
+    header: 'Profil von: {{$1}}'
+    activity:
+      online: 'Online'
+      offline: 'Offline ( Seit {{$1}} vor)'
   error:
     logged-in: 'Sie sind schon angemeldet!'
     not-logged-in: 'Die Anmeldung ist fehlgeschlagen.'
     lost: 'Hast du dich vielleicht verirrt?'
     return-back: 'Klicken Sie hier um in Sicherheit zu gelangen'
+    user-no-exist: 'Dieser Benutzer exisitiert nicht'
+    invalid-credentials: 'Ungültige Anmeldeinformationen'
     email-invalid: 'Emailadresse ungültig'
     email-used: 'E-Mail-Adresse wird schon verwendet'
     username-invalid: 'Benutzername ungültig'

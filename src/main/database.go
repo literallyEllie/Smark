@@ -103,7 +103,7 @@ func UpdateUserDB(user *User) {
 	}
 }
 
-// Makes a query case insensitive
+// Makes a query- case insensitive
 func cIQuery(in string) map[string]interface{} {
 	return bson.M{"$regex": bson.RegEx{Pattern: "^" + in + "$", Options: "i"}}
 }

@@ -63,6 +63,7 @@ func main() {
 	http.HandleFunc("/login", loginHandle)
 	http.HandleFunc("/signup", signupHandle)
 	http.HandleFunc("/logout", logoutHandle)
+	http.HandleFunc("/profile/", profileLoadHandle)
 	http.HandleFunc("/res/", handleResourceRequest)
 
 	http.ListenAndServe(":8080", gContext.ClearHandler(http.DefaultServeMux))

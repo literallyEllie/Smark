@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/gorilla/sessions"
 )
@@ -27,14 +28,50 @@ const (
 // ViewData is the data passed to the templates when a page is loaded.
 type ViewData struct {
 	Viewer *User
-	// FlashData []FlashCookie
+	// FlashData is a map of flash data loaded into the page view
 	FlashData map[string]string
+	// Data is a map of data that is applicable to the loaded page.
+	Data map[string]interface{}
+
+	// ProfileView is the sub-struct used when vieiwng another's profile
+	ProfileView
 }
 
 // FlashCookie contains flash data of a session
 type FlashCookie struct {
 	Key     string
 	Content string
+}
+
+// ContainsKey is a method to check if a viewdata's flash data contains a key or not.
+func (data ViewData) ContainsKey(key string) bool {
+	if data.FlashData == nil {
+		return false
+	}
+
+	for k := range data.FlashData {
+		if k == key {
+			return true
+		}
+	}
+
+	return false
+}
+
+// GetFlashKey tries to get a flash data by the key
+func (data ViewData) GetFlashKey(key string) string {
+	if data.FlashData == nil {
+		return ""
+	}
+
+	for k := range data.FlashData {
+		if k == key {
+			log.Println(k)
+			return k
+		}
+	}
+
+	return "\""
 }
 
 // Cookies is where the cookies are stored.
@@ -188,7 +225,7 @@ func GetSessionedUser(req *http.Request, w http.ResponseWriter) (*User, string, 
 	sessionKeyRaw := session.Values["id"]
 	if sessionKeyRaw == nil {
 		user.Locale = GetLocale(req)
-		return user, "", string(T(user.Locale, "error.not-logged-in"))
+		return user, "", string(T(user.Locale, "login.login-prompt"))
 	}
 	sessionKey := sessionKeyRaw.(string)
 
@@ -197,7 +234,7 @@ func GetSessionedUser(req *http.Request, w http.ResponseWriter) (*User, string, 
 	// If they aren't logged in
 	if !ok {
 		user = &User{Username: "", Locale: GetLocale(req)}
-		return user, "", string(T(user.Locale, "error.not-logged-in"))
+		return user, "", string(T(user.Locale, "login.login-prompt"))
 	}
 
 	if user.Locale == "" {
@@ -218,12 +255,14 @@ func generateSessionKey() string {
 	return base64.URLEncoding.EncodeToString(b)
 }
 
-// Creates a cookie based on user data and sets to a  response writer
+// Creates a cookie based on user data and sets to a response writer
 func createCookie(u *User, req *http.Request, w http.ResponseWriter) {
 	session, err := cookies.Get(req, "session-id")
 	if err != nil {
 		log.Printf("[!!] Failed to create get cookie info from Cookies for %s", u.Username)
 	}
+
+	u.Online = true
 
 	// make new key
 	newKey := generateSessionKey()
@@ -239,8 +278,12 @@ func createCookie(u *User, req *http.Request, w http.ResponseWriter) {
 func deleteCookie(u *User, req *http.Request, w http.ResponseWriter) {
 	// Can't get data via GetSessionedUser as we need to get Session and expire it.
 	session, err := cookies.Get(req, "session-id")
+
+	u.Online = false
+	u.LastSeen = time.Now()
+
 	if err != nil {
-		UserDB[u.Username] = u
+		SaveAccount(u)
 		log.Printf("[!!] Failed to delete get cookie info from Cookies for %s", u.Username)
 		// TODO try and get session id from looking SessionData
 
@@ -263,7 +306,7 @@ func deleteCookie(u *User, req *http.Request, w http.ResponseWriter) {
 	// Remove from session data
 	delete(SessionData, sessionKey)
 	// Push to database
-	UserDB[u.Username] = u
+	SaveAccount(u)
 
 	// Expire cookie
 	session.Options.MaxAge = -1
@@ -276,37 +319,6 @@ func deleteCookie(u *User, req *http.Request, w http.ResponseWriter) {
 		http.SetCookie(w, cookie)
 	}
 
-}
-
-// ContainsKey is a method to check if a viewdata's flash data contains a key or not.
-func (data ViewData) ContainsKey(key string) bool {
-	if data.FlashData == nil {
-		return false
-	}
-
-	for k := range data.FlashData {
-		if k == key {
-			return true
-		}
-	}
-
-	return false
-}
-
-// GetFlashKey tries to get a flash data by the key
-func (data ViewData) GetFlashKey(key string) string {
-	if data.FlashData == nil {
-		return ""
-	}
-
-	for k := range data.FlashData {
-		if k == key {
-			log.Println(k)
-			return k
-		}
-	}
-
-	return "\""
 }
 
 // CreateFlashCookie creates a temporary cookie which is used to show tempoary notifications to them for the next reload
