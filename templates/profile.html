@@ -4,10 +4,19 @@
 
     <h3>{{ t .Viewer.Locale "profile.header" .ProfileView.Owner.QualifiedName }}
         {{ if .ProfileView.Owner.Online }}<span class="status online">{{t .Viewer.Locale "profile.activity.online" }}</span>{{ else }}
-        <span class="status offline">{{t .Viewer.Locale "profile.activity.offline" "100 years" }}</span>
+        <span class="status offline">{{t .Viewer.Locale "profile.activity.offline" .ProfileView.Owner.DisplayLastSeen }}</span>
         {{ end }}</h3>
-
     <i class="fas fa-user-alt fa-5x" aria-hidden="true"></i>
+
+    <div class="profile-viewer">
+        <i class="fas fa-user-plus"></i><span class="menu-item">Add</span>
+        <i class="fas fa-exclamation-circle"></i><span class="menu-item">Report</span>
+
+        {{ if .Viewer.IsAdmin }}
+            <i class="fas fa-toolbox"></i><span class="menu-item">Admin</span>
+        {{ end }}
+
+    </div>
 
 </div>
 {{ template "footer" . }}

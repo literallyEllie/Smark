@@ -21,7 +21,7 @@ GB:
     header: 'Profile of: {{$1}}'
     activity:
       online: 'Online'
-      offline: 'Offline (Since {{$1}} ago)'
+      offline: 'Offline (Since {{$1}})'
   error:
     logged-in: 'You are already logged in!'
     not-logged-in: 'You were not logged in.'

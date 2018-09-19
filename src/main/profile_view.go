@@ -44,7 +44,7 @@ func profileLoadHandle(w http.ResponseWriter, req *http.Request) {
 
 	templateErr := templates.ExecuteTemplate(w, "profile.html", viewData)
 	if templateErr != nil {
-		log.Println("Error exectuing profile template ", templateErr)
+		log.Println("Error executing profile template ", templateErr)
 	}
 
 }

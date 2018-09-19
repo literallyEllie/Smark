@@ -7,9 +7,8 @@ h1 {
     font-family: Verdana;
 }
 
-body { 
-    background: url("background.jpg");
-    background-repeat: no-repeat;
+body {
+    background: url("background.jpg") no-repeat;
     background-size: cover;
     position: relative;
 }
@@ -42,7 +41,7 @@ a {
 .vertical-side a {
     color: white;
     display: block;
-    padding: 5px 0px 10px 5px; 
+    padding: 5px 0 10px 5px;
     text-decoration: none; 
     position: absolute;
     bottom: 0;
@@ -62,7 +61,7 @@ a {
     color: inherit;
     position: initial;
     display: initial;
-    padding: 5px 0px 0px 0px; 
+    padding: 5px 0 0 0;
 }
 
 /* Dashboard */
@@ -81,7 +80,7 @@ a {
 .a-box i {
     color: black;
     float: right;
-    right: 0px;
+    right: 0;
     padding: 10px;
     position: static;
 }
@@ -99,6 +98,30 @@ a {
 
 .status.offline {
     color: red;
+}
+
+.profile-viewer {
+    margin-top: 50px;
+    display: table; 
+    overflow: auto;
+    border-radius: 5px;
+    outline: 2px dotted;
+}
+
+.profile-viewer li {
+    display: inline;
+}
+
+.profile-viewer i {
+    float: left;
+}
+
+.profile-viewer .menu-item {
+    padding: 5px 0;
+    font-size: 15px;
+    float: left;
+    padding-top: 10px;
+    padding-right: 10px;
 }
 
 /* Center boxes!  */

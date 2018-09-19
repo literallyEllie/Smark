@@ -191,7 +191,7 @@ func signupHandle(w http.ResponseWriter, req *http.Request) {
 	// Execute the template.
 	templateErr := templates.ExecuteTemplate(w, "signup.html", viewData)
 	if templateErr != nil {
-		log.Println("Error exectuing signup template ", templateErr)
+		log.Println("Error executing signup template ", templateErr)
 	}
 
 }
@@ -215,7 +215,6 @@ func GetSessionedUser(req *http.Request, w http.ResponseWriter) (*User, string, 
 	session, err := cookies.Get(req, "session-id")
 	user := &User{Username: ""}
 
-	// TODO cache locale
 	if err != nil {
 		user.Locale = GetLocale(req)
 		return user, "", err.Error()
@@ -230,6 +229,7 @@ func GetSessionedUser(req *http.Request, w http.ResponseWriter) (*User, string, 
 	sessionKey := sessionKeyRaw.(string)
 
 	user, ok := SessionData[sessionKey]
+	log.Print(user)
 
 	// If they aren't logged in
 	if !ok {
@@ -263,6 +263,7 @@ func createCookie(u *User, req *http.Request, w http.ResponseWriter) {
 	}
 
 	u.Online = true
+	log.Print("online ", u.Online)
 
 	// make new key
 	newKey := generateSessionKey()

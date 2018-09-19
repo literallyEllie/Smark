@@ -26,3 +26,5 @@ _testmain.go
 db\.json
 
 sess_key.txt
+
+\.idea/

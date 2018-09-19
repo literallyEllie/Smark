@@ -23,6 +23,7 @@ Users only! ![Users only page](https://i.imgur.com/lXhRFT7.jpg)
  - [yaml.v2](https://godoc.org/gopkg.in/yaml.v2)
  - [i18n](https://godoc.org/github.com/qor/i18n)
  - [MaxmindDB Reader](https://github.com/oschwald/maxminddb-golang)
+ - [Go-PrettyTime](https://github.com/andanhm/go-prettytime)
 
 
 **Thank you for reading!!**

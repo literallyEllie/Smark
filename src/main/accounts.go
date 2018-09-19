@@ -1,7 +1,9 @@
 package main
 
 import (
+	"github.com/andanhm/go-prettytime"
 	"log"
+	"strings"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -38,6 +40,19 @@ func (user User) Prefix() string {
 		return "[ADMIN]"
 	}
 	return ""
+}
+
+// DisplayLastSeen formats the user's last seen timestamp.
+func (user User) DisplayLastSeen() string {
+
+	log.Print(user.Online)
+
+	// Not seen
+	if user.LastSeen.Unix() == -62135596800 {
+		return "Unknown"
+	}
+
+	return prettytime.Format(user.LastSeen)
 }
 
 // UserDB is a temp map containing user data, an effective database
@@ -134,7 +149,9 @@ func hashSaltPassword(password []byte) []byte {
 func passMatch(hashed []byte, input []byte) bool {
 	err := bcrypt.CompareHashAndPassword(hashed, input)
 	if err != nil {
-		log.Println("[!!] Error comparing hashed password. ", err)
+		if !strings.Contains(err.Error(), "is not the hash of the given password") {
+			log.Println("[!!] Error comparing hashed password. ", err)
+		}
 		return false
 	}
 

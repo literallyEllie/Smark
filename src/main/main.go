@@ -49,7 +49,7 @@ func main() {
 
 				err = execTemplate.Execute(w, viewData)
 				if err != nil {
-					log.Println("[!!] Failed to exectute template ", err)
+					log.Println("[!!] Failed to execute template ", err)
 				}
 
 				return
