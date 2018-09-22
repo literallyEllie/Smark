@@ -5,6 +5,16 @@
 <div class="a-box">
     <h3>{{ t .Viewer.Locale "dashboard.welcome" .Viewer.QualifiedName }} </h3>
     <i class="fas fa-user-alt fa-5x" aria-hidden="true"></i>
+
+    <div class="profile-viewer">
+        <i class="fas fa-user-friends"></i><a href="#" class="menu-item">Friends: 0</a>
+
+    {{ if .Viewer.IsAdmin }}
+        <i class="fas fa-toolbox"></i><a href="#" class="menu-item">Admin</a>
+    {{ end }}
+
+    </div>
+
 </div>
 
 {{ template "footer" . }}

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/andanhm/go-prettytime"
 	"log"
 	"strings"
@@ -23,30 +24,24 @@ type User struct {
 	// Misc
 	IsAdmin bool   `bson:"isadmin"`
 	Locale  string `bson:"locale"`
+	GlobalTag string `bson:"globaltag"`
 }
 
 // QualifiedName returns their qualified name including their prefix tag, if applicable.
 func (user User) QualifiedName() string {
-	if user.IsAdmin {
-		return user.Prefix() + " " + user.Username
-	}
-
-	return user.Username
+	return user.Prefix() + user.Username
 }
 
 // Prefix returns a prefix for the user
 func (user User) Prefix() string {
 	if user.IsAdmin {
-		return "[ADMIN]"
+		return "[ADMIN] "
 	}
-	return ""
+	return user.GlobalTag + " "
 }
 
 // DisplayLastSeen formats the user's last seen timestamp.
 func (user User) DisplayLastSeen() string {
-
-	log.Print(user.Online)
-
 	// Not seen
 	if user.LastSeen.Unix() == -62135596800 {
 		return "Unknown"
@@ -55,11 +50,15 @@ func (user User) DisplayLastSeen() string {
 	return prettytime.Format(user.LastSeen)
 }
 
+func (user User) String() string {
+	return fmt.Sprintf("username:%s,online:%t,last_seen:%s,admin:%t,locale:%s", user.Username, user.Online, user.LastSeen.String(), user.IsAdmin, user.Locale)
+}
+
 // UserDB is a temp map containing user data, an effective database
 // var UserDB = map[string]*User{}
 
 // GetAccount gets a user from the database with the given query and returns them
-func GetAccount(query string) *User {
+func GetAccount(query string, allowEmail bool) *User {
 
 	/*
 		for _, u := range UserDB {
@@ -72,7 +71,28 @@ func GetAccount(query string) *User {
 		}
 	*/
 
-	return GetUserByEmailUsername(query)
+	var account *User
+
+	if allowEmail {
+		account = GetUserByEmailUsername(query)
+
+		if account == nil {
+			return nil
+		}
+
+	}
+
+	account = GetUserByName(query)
+	if account == nil {
+		return nil
+	}
+
+	onlineAccount := GetOnlineUser(account)
+	if onlineAccount == nil {
+		return account
+	}
+
+	return onlineAccount
 }
 
 // SaveAccount saves a userdata to db

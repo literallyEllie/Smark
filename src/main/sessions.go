@@ -102,7 +102,7 @@ func loginHandle(w http.ResponseWriter, req *http.Request) {
 		password := req.FormValue("password")
 
 		// get from db
-		u := GetAccount(username)
+		u := GetAccount(username, true)
 
 		// tell them to go away
 		if u == nil {
@@ -144,7 +144,7 @@ func loginHandle(w http.ResponseWriter, req *http.Request) {
 	// Load template
 	templateErr := templates.ExecuteTemplate(w, "login.html", viewData)
 	if templateErr != nil {
-		log.Println("Error exectuing login template:", templateErr)
+		log.Println("Error executing login template:", templateErr)
 	}
 
 }
@@ -229,7 +229,6 @@ func GetSessionedUser(req *http.Request, w http.ResponseWriter) (*User, string, 
 	sessionKey := sessionKeyRaw.(string)
 
 	user, ok := SessionData[sessionKey]
-	log.Print(user)
 
 	// If they aren't logged in
 	if !ok {
@@ -242,6 +241,18 @@ func GetSessionedUser(req *http.Request, w http.ResponseWriter) (*User, string, 
 	}
 
 	return user, sessionKey, ""
+}
+
+func GetOnlineUser(user *User) *User {
+
+	// TODO Find a more efficient way to do this
+	for _, u := range SessionData {
+		if u.Username == user.Username && u.LastSeen.After(time.Now().Add(-(5 * time.Minute))) {
+			return u
+		}
+	}
+
+	return nil
 }
 
 // Session assignment
@@ -263,7 +274,8 @@ func createCookie(u *User, req *http.Request, w http.ResponseWriter) {
 	}
 
 	u.Online = true
-	log.Print("online ", u.Online)
+	u.LastSeen = time.Now()
+	u.GlobalTag = "[OG]"
 
 	// make new key
 	newKey := generateSessionKey()
@@ -362,7 +374,6 @@ func LoadFlashCookies(req *http.Request, w http.ResponseWriter, viewData *ViewDa
 // CheckAccess checks access of a requester ensuring they have rights to visit
 func CheckAccess(w http.ResponseWriter, req *http.Request, reqPage string) (*User, error) {
 	var user *User
-
 	user, _, err := GetSessionedUser(req, w)
 
 	// If they're not logged in (i.e in SessionData) and they're not already trying to login, tell them to go away.

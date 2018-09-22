@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"time"
 )
 
 // ProfileView contains the data needed when viewing another profile
@@ -19,6 +20,8 @@ func profileLoadHandle(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	user.LastSeen = time.Now()
+
 	requestedProfile := req.URL.Path[len("/profile/"):]
 
 	log.Printf("Requested profile %s", requestedProfile)
@@ -29,7 +32,7 @@ func profileLoadHandle(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	targetProfile := GetUserByName(requestedProfile)
+	targetProfile := GetAccount(requestedProfile, false)
 	if targetProfile == nil {
 		http.Redirect(w, req, "/404", http.StatusSeeOther)
 		return

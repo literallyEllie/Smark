@@ -16,7 +16,7 @@ NL:
       username: 'Een unieke gebruikersnaam'
       password: 'Een geheim wachtwoord'
   dashboard:
-    welcome: 'Welkom terug, {{$1}} {{$2}}'
+    welcome: 'Welkom terug, {{$1}}'
   profile:
     header: 'Profiel van: {{$1}}'
     activity:

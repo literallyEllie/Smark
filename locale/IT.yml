@@ -16,7 +16,7 @@ IT:
       username: 'Un username unico'
       password: 'Una password segreta'
   dashboard:
-    welcome: 'Bentornato, {{$1}} {{$2}}'
+    welcome: 'Bentornato, {{$1}}'
   profile:
     header: 'Profilo di: {{$1}}'
     activity:

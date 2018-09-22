@@ -76,7 +76,7 @@ func GetUserByName(username string) *User {
 // GetUserByEmailUsername attemps to get a user by their username or email
 func GetUserByEmailUsername(field string) *User {
 	var rUser *User
-	err := userCollection().Find(bson.M{"$or": []bson.M{bson.M{"username": cIQuery(field)}, bson.M{"email": cIQuery(field)}}}).One(&rUser)
+	err := userCollection().Find(bson.M{"$or": []bson.M{{"username": cIQuery(field)}, {"email": cIQuery(field)}}}).One(&rUser)
 	if err != nil {
 		return nil
 	}
